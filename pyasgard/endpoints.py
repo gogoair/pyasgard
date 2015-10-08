@@ -44,7 +44,7 @@ mapping_table = {
         'status': 200,
     },
     'cluster_resize': {
-        'path': 'cluster/resize',
+        'path': '/cluster/resize',
         'valid_params': ('name', 'minAndMaxSize'),
         'method': 'GET',
         'status': 200,
