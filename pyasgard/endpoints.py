@@ -28,7 +28,7 @@ mapping_table = {
         'method': 'GET',
         'status': 200,
     },
-    'resize_cluster': {
+    'cluster_resize': {
         'path': '/cluster/resize',
         'method': 'POST',
         'status': 200,
@@ -40,12 +40,6 @@ mapping_table = {
     },
     'show_ami': {
         'path': '/image/show/{{ami_id}}.json',
-        'method': 'GET',
-        'status': 200,
-    },
-    'cluster_resize': {
-        'path': '/cluster/resize',
-        'valid_params': ('name', 'minAndMaxSize'),
         'method': 'GET',
         'status': 200,
     },
