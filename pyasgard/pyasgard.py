@@ -163,7 +163,7 @@ class Asgard(object):
         return call.__get__(self)
 
     @staticmethod
-    def _response_handler(response, content, status):
+    def _response_handler(response, status):
         """
         Handle response as callback
 
@@ -177,19 +177,10 @@ class Asgard(object):
         # Just in case
         if not response:
             raise AsgardError('Response Not Found')
-        response_status = int(response.get('status', 0))
-        if response_status != status:
-            raise AsgardError(content, response_status)
+
+        if response.status_code != status:
+            raise AsgardError(response.reason, response.status_code)
 
         # Deserialize json content if content exist. In some cases Asgard
         # returns ' ' strings. Also return false non strings (0, [], (), {})
-        if response.get('location'):
-            return response.get('location')
-        elif content.strip():
-            return json.loads(content)
-        else:
-            return responses[response_status]
-
-    @staticmethod
-    def _response_handler_test(url):
-        print url
+        return response.json()
