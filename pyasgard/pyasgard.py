@@ -158,13 +158,9 @@ class Asgard(object):
 
         If the response status is different from status defined in the
         mapping table, then we assume an error and raise proper exception
-
-        Asgard's response is sometimes the url of a newly created user/
-        ticket/group/etc and they pass this through 'location'.  Otherwise,
-        the body of 'content' has our response.
         """
         # Just in case
-        if not response:
+        if response is None:
             raise AsgardError('Response Not Found')
 
         if response.status_code != status:
