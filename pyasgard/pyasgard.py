@@ -43,17 +43,17 @@ class AuthenticationError(AsgardError):
 class Asgard(object):
     """ Python API Wrapper for Asgard"""
 
-    def __init__(self, asgard_url, asgard_username=None,
-                 asgard_password=None, headers=None,
+    def __init__(self, url, username=None,
+                 password=None, headers=None,
                  client_args={}, api_version=1, ec2_region='us-east-1'):
         """
         Instantiates an instance of Asgard. Takes optional parameters for
         HTTP Basic Authentication
 
         Parameters:
-        asgard_url - https://company.asgard.com (use http if not SSL enabled)
-        asgard_username - Specific to your asgard account (typically email)
-        asgard_password - Specific to your asgard account or your account's
+        url - https://company.asgard.com (use http if not SSL enabled)
+        username - Specific to your asgard account (typically email)
+        password - Specific to your asgard account or your account's
             API token if use_api_token is True
         use_api_token - use api token for authentication instead of user's
             actual password
@@ -64,9 +64,9 @@ class Asgard(object):
             {"disable_ssl_certificate_validation": True}
         """
         self.data = None
-        self.asgard_url = '{}/{}'.format(asgard_url.rstrip('/'), ec2_region)
-        self.asgard_username = asgard_username
-        self.asgard_password = asgard_password
+        self.url = '{}/{}'.format(url.rstrip('/'), ec2_region)
+        self.username = username
+        self.password = password
 
         # Set headers
         self.headers = headers
@@ -123,7 +123,7 @@ class Asgard(object):
                 # Optional pagination parameters will default to blank
                 #lambda m: "%s" % kwargs.pop(m.group(1), ''),
                 lambda m: '{}'.format(kwargs.pop(m.group(1), '')),
-                '{}{}'.format(self.asgard_url, path)
+                '{}{}'.format(self.url, path)
             )
 
             # Validate remaining kwargs against valid_params and add
