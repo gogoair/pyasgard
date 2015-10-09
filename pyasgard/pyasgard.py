@@ -138,11 +138,9 @@ class Asgard(object):
                 'timeout': 15
             }
 
-            try:
-                response = getattr(requests, method.lower())(**url_params)
-                return self._response_handler(response, status)
-            except Exception as e:
-                raise AsgardError(error_code=100, msg=e.message)
+
+            response = getattr(requests, method.lower())(**url_params)
+            return self._response_handler(response, status)
 
         # Missing method is also not defined in our mapping table
         if api_call not in self.mapping_table:
