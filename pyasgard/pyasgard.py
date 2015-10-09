@@ -130,14 +130,13 @@ class Asgard(object):
             url_params = {
                 'url': url,
                 'data': body,
-                'auth': (
-                    self.username,
-                    decrypt_hash(self.password)
-                ),
                 'headers': self.headers,
-                'timeout': 15
+                'timeout': 15,
             }
 
+            if self.username and self.password:
+                auth = { 'auth': (self.username, decrypt_hash(self.password)) }
+                url_params.update(auth)
 
             response = getattr(requests, method.lower())(**url_params)
             return self._response_handler(response, status)
