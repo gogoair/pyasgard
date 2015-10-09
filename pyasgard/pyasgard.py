@@ -2,13 +2,15 @@ __author__ = "Sijis Aviles <saviles@gogoair.com>"
 __version__ = "1.0"
 
 import re
-import httplib2
-import urllib
+import base64
+
 try:
     import simplejson as json
 except:
     import json
-from httplib import responses
+
+import requests
+
 from endpoints import mapping_table as mapping_table
 
 def clean_kwargs(kwargs):
@@ -76,15 +78,6 @@ class Asgard(object):
                 'Content-Type': 'application/json'
             }
 
-        # Set http client and authentication
-        self.client = httplib2.Http(**client_args)
-        if (self.asgard_username is not None and
-                self.asgard_password is not None):
-            self.client.add_credentials(
-                self.asgard_username,
-                self.asgard_password
-            )
-
         self.api_version = api_version
         self.mapping_table = mapping_table
 
@@ -132,26 +125,24 @@ class Asgard(object):
                 if kw not in valid_params:
                     raise TypeError("%s() got an unexpected keyword argument "
                                     "'%s'" % (api_call, kw))
-            else:
-                clean_kwargs(kwargs)
-                url += '?' + urllib.urlencode(kwargs)
 
-            #clean_kwargs(kwargs)
-            #url += '?' + urllib.urlencode(kwargs)
-
-            return self._response_handler_test(url)
             # Make an http request (data replacements are finalized)
-            '''
-            response, content = \
-                self.client.request(
-                    url,
-                    method,
-                    body=json.dumps(body),
-                    headers=self.headers
-                )
-            # Use a response handler to determine success/fail
-            return self._response_handler(response, content, status)
-            '''
+            url_params = {
+                'url': url,
+                'data': body,
+                'auth': (
+                    self.username,
+                    decrypt_hash(self.password)
+                ),
+                'headers': self.headers,
+                'timeout': 15
+            }
+
+            try:
+                response = getattr(requests, method.lower())(**url_params)
+                return self._response_handler(response, status)
+            except Exception as e:
+                raise AsgardError(error_code=100, msg=e.message)
 
         # Missing method is also not defined in our mapping table
         if api_call not in self.mapping_table:
