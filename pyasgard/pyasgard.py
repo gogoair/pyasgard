@@ -11,6 +11,18 @@ except:
 from httplib import responses
 from endpoints import mapping_table as mapping_table
 
+def clean_kwargs(kwargs):
+    """Format the kwargs to conform to API"""
+
+    for key, value in kwargs.iteritems():
+        if hasattr(value, '__iter__'):
+            kwargs[key] = ','.join(map(str, value))
+
+def decrypt_hash(string):
+    string = base64.b64decode(string)
+    return string
+
+
 class AsgardError(Exception):
     def __init__(self, msg, error_code=None):
         self.msg = msg
@@ -22,24 +34,10 @@ class AsgardError(Exception):
 
 class AuthenticationError(AsgardError):
     def __init__(self, msg):
-        self.msg = msg
+        self.msg = msg 
 
     def __str__(self):
         return repr(self.msg)
-
-
-def get_id_from_url(url):
-    match = re_identifier.match(url)
-    if match and match.group('identifier'):
-        return match.group('identifier')
-
-
-def clean_kwargs(kwargs):
-    """Format the kwargs to conform to API"""
-
-    for key, value in kwargs.iteritems():
-        if hasattr(value, '__iter__'):
-            kwargs[key] = ','.join(map(str, value))
 
 
 class Asgard(object):
