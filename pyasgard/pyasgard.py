@@ -62,7 +62,7 @@ class Asgard(object):  # pylint: disable=R0903
                  username=None,
                  password=None,
                  headers=None,
-                 client_args={},
+                 # client_args={},
                  api_version=1,
                  ec2_region='us-east-1'):
         """
