@@ -54,7 +54,7 @@ class AuthenticationError(AsgardError):
         return repr(self.msg)
 
 
-class Asgard(object):
+class Asgard(object):  # pylint: disable=R0903
     """ Python API Wrapper for Asgard"""
 
     def __init__(self,
