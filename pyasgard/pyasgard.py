@@ -143,10 +143,10 @@ class Asgard(object):
             # Validate remaining kwargs against valid_params and add
             # params url encoded to url variable.
             logging.debug(kwargs)
-            for kw in kwargs:
-                if kw not in valid_params:
+            for keyword in kwargs:
+                if keyword not in valid_params:
                     raise TypeError("%s() got an unexpected keyword argument "
-                                    "'%s'" % (api_call, kw))
+                                    "'%s'" % (api_call, keyword))
 
             # Make an http request (data replacements are finalized)
             url_params = {
