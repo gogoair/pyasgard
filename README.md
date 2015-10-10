@@ -17,7 +17,7 @@ asgard = Asgard('http://asgard.example.com')
 #     username='user',
 #     password=b64encode('secret'))
 
-asgard.show_ami(ami_id='ami-i1234x')
+asgard.show_ami(oid='ami-i1234x')
 asgard.cluster_resize(name='appname', minAndMaxSize=4)
 
 ```
