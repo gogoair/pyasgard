@@ -133,13 +133,12 @@ class Asgard(object):  # pylint: disable=R0903
             # Body can be passed from data or in args
             body = kwargs.pop('data', None) or self.data
 
-            # Substitute mustache '{{}}' placeholders with data from keywords
+            # Substitute mustache '{}' placeholders with data from keywords
             # Optional pagination parameters will default to blank
-            # regex_pattern = '\{\{(?P<m>[a-zA-Z_]+)\}\}'
-            regex_pattern = '{{(?P<m>[a-zA-Z_]+)}}'
-            url = re.sub(regex_pattern,
-                         lambda m: '{}'.format(kwargs.pop(m.group(1), '')),
-                         '{}{}'.format(self.url, path))
+            if '{}' in path and 'oid' not in kwargs:
+                raise AsgardError('Must specify `oid` parameter.')
+
+            url = (self.url + path).format(kwargs.pop('oid', None))
             logging.debug(url)
 
             # Validate remaining kwargs against valid_params and add
