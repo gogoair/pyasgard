@@ -1,3 +1,4 @@
+"""Python interface to Netflix Asgard REST API."""
 __author__ = "Sijis Aviles <saviles@gogoair.com>"
 __version__ = "1.0"
 
@@ -25,11 +26,14 @@ def clean_kwargs(kwargs):
 
 
 def decrypt_hash(string):
+    """Decrypt the encrypted password string."""
     string = base64.b64decode(string)
     return string
 
 
 class AsgardError(Exception):
+    """Error from request to Asgard API."""
+
     def __init__(self, msg, error_code=None):
         self.msg = msg
         self.error_code = error_code
@@ -39,6 +43,8 @@ class AsgardError(Exception):
 
 
 class AuthenticationError(AsgardError):
+    """Failed authentication with Asgard API."""
+
     def __init__(self, msg):
         self.msg = msg
 
