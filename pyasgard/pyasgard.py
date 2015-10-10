@@ -72,8 +72,8 @@ class Asgard(object):  # pylint: disable=R0903
         Parameters:
         url - https://company.asgard.com (use http if not SSL enabled)
         username - Specific to your asgard account (typically email)
-        password - Specific to your asgard account or your account's
-            API token if use_api_token is True
+        password - (b64encode(str)) Specific to your asgard account or your
+            account's API token if use_api_token is True
         use_api_token - use api token for authentication instead of user's
             actual password
         headers - Pass headers in dict form. This will override default.
