@@ -3,6 +3,7 @@ __version__ = "1.0"
 
 import re
 import base64
+import logging
 
 try:
     import simplejson as json
@@ -15,10 +16,14 @@ from endpoints import mapping_table as mapping_table
 
 def clean_kwargs(kwargs):
     """Format the kwargs to conform to API"""
+    logging.debug(kwargs)
 
     for key, value in kwargs.iteritems():
         if hasattr(value, '__iter__'):
-            kwargs[key] = ','.join(map(str, value))
+            kwargs[key] = ','.join(str(item) for item in value)
+
+    logging.debug(kwargs)
+
 
 def decrypt_hash(string):
     string = base64.b64decode(string)
