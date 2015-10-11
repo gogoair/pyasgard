@@ -3,6 +3,7 @@ __version__ = "1.0"
 
 import re
 import base64
+import logging
 
 try:
     import simplejson as json
@@ -115,6 +116,7 @@ class Asgard(object):
                          # Optional pagination parameters will default to blank
                          lambda m: '{}'.format(kwargs.pop(m.group(1), '')),
                          '{}{}'.format(self.url, path))
+            logging.debug('url=%s', url)
 
             # Validate remaining kwargs against valid_params and add
             # params url encoded to url variable.
