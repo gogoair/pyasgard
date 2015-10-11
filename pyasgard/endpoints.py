@@ -14,7 +14,7 @@ mapping_table = {
         'status': 200,
     },
     'list_application_instances': {
-        'path': '/instance/{{app_id}}.json',
+        'path': '/instance/list/{{app_id}}.json',
         'method': 'GET',
         'status': 200,
     },
