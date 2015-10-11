@@ -1,17 +1,13 @@
 __author__ = "Sijis Aviles <saviles@gogoair.com>"
 __version__ = "1.0"
 
-import re
 import base64
-
-try:
-    import simplejson as json
-except:
-    import json
+import re
 
 import requests
 
 from endpoints import mapping_table as mapping_table
+
 
 def clean_kwargs(kwargs):
     """Format the kwargs to conform to API"""
