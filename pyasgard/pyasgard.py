@@ -3,6 +3,9 @@ __version__ = "1.0"
 
 import re
 import base64
+import inspect
+import logging
+from pprint import pformat
 
 try:
     import simplejson as json
@@ -15,13 +18,17 @@ from endpoints import mapping_table as mapping_table
 
 def clean_kwargs(kwargs):
     """Format the kwargs to conform to API"""
+    logging.debug('Clean these kwargs:\n%s', pformat(kwargs))
 
     for key, value in kwargs.iteritems():
         if hasattr(value, '__iter__'):
             kwargs[key] = ','.join(map(str, value))
 
+    logging.debug('Cleaned:\n%s', pformat(kwargs))
+
 def decrypt_hash(string):
     string = base64.b64decode(string)
+    logging.debug('Password decrypted.')
     return string
 
 
@@ -65,6 +72,8 @@ class Asgard(object):
             or a common one is to disable SSL certficate validation
             {"disable_ssl_certificate_validation": True}
         """
+        logging.debug('init locals():\n%s', pformat(locals()))
+
         self.data = None
         self.url = '{}/{}'.format(url.rstrip('/'), ec2_region)
         self.username = username
@@ -101,12 +110,18 @@ class Asgard(object):
         """
         def call(self, **kwargs):
             """ """
+            logging.debug('call locals():\n%s', pformat(locals()))
+
             api_map = self.mapping_table[api_call]
+            logging.debug('api_map:\n%s', pformat(api_map))
+
             path = api_map['path']
 
             method = api_map['method']
             status = api_map['status']
             valid_params = api_map.get('valid_params', ())
+            logging.debug('valid_params=%s', pformat(valid_params))
+
             # Body can be passed from data or in args
             body = kwargs.pop('data', None) or self.data
 
@@ -118,9 +133,11 @@ class Asgard(object):
                 lambda m: '{}'.format(kwargs.pop(m.group(1), '')),
                 '{}{}'.format(self.url, path)
             )
+            logging.debug('url=%s', url)
 
             # Validate remaining kwargs against valid_params and add
             # params url encoded to url variable.
+            logging.debug('kwargs:\n%s', pformat(kwargs))
             for kw in kwargs:
                 if kw not in valid_params:
                     raise TypeError("%s() got an unexpected keyword argument "
@@ -138,8 +155,17 @@ class Asgard(object):
                 auth = { 'auth': (self.username, decrypt_hash(self.password)) }
                 url_params.update(auth)
 
+            logging.debug(
+                'getattr(%s, %s)(%s)\n[auth] redacted', requests,
+                method.lower(), pformat({
+                    key: value
+                    for key, value in url_params.items() if key != 'auth'
+                }))
             response = getattr(requests, method.lower())(**url_params)
+
             return self._response_handler(response, status)
+
+        logging.debug('getattr locals():\n%s', pformat(locals()))
 
         # Missing method is also not defined in our mapping table
         if api_call not in self.mapping_table:
@@ -156,6 +182,10 @@ class Asgard(object):
         If the response status is different from status defined in the
         mapping table, then we assume an error and raise proper exception
         """
+        logging.debug('Expected response status: %s', status)
+        logging.debug('Request response:\n%s',
+                      pformat(inspect.getmembers(response)))
+
         # Just in case
         if response is None:
             raise AsgardError('Response Not Found')
@@ -165,4 +195,6 @@ class Asgard(object):
 
         # Deserialize json content if content exist. In some cases Asgard
         # returns ' ' strings. Also return false non strings (0, [], (), {})
-        return response.json()
+        response_json = response.json()
+        logging.debug('Response JSON:\n%s', pformat(response_json))
+        return response_json
