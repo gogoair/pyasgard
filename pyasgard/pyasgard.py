@@ -81,6 +81,9 @@ class Asgard(object):
         self.api_version = api_version
         self.mapping_table = mapping_table
 
+    def __dir__(self):
+        return self.__dict__.keys() + self.mapping_table.keys()
+
     def __getattr__(self, api_call):
         """
         Instead of writing out each API endpoint as a method here or
