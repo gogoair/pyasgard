@@ -111,13 +111,10 @@ class Asgard(object):
             body = kwargs.pop('data', None) or self.data
 
             # Substitute mustache '{{}}' placeholders with data from keywords
-            url = re.sub(
-                '\{\{(?P<m>[a-zA-Z_]+)\}\}',
-                # Optional pagination parameters will default to blank
-                #lambda m: "%s" % kwargs.pop(m.group(1), ''),
-                lambda m: '{}'.format(kwargs.pop(m.group(1), '')),
-                '{}{}'.format(self.url, path)
-            )
+            url = re.sub(r'{{(?P<m>[a-zA-Z_]+)}}',
+                         # Optional pagination parameters will default to blank
+                         lambda m: '{}'.format(kwargs.pop(m.group(1), '')),
+                         '{}{}'.format(self.url, path))
 
             # Validate remaining kwargs against valid_params and add
             # params url encoded to url variable.
