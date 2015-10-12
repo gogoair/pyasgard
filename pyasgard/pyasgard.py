@@ -15,15 +15,6 @@ from endpoints import mapping_table as mapping_table
 # except ImportError:
 #     import json
 
-
-def clean_kwargs(kwargs):
-    """Format the kwargs to conform to API"""
-
-    for key, value in kwargs.iteritems():
-        if hasattr(value, '__iter__'):
-            kwargs[key] = ','.join(map(str, value))
-
-
 def decrypt_hash(string):
     """Decrypt the encrypted password string."""
     string = base64.b64decode(string)
