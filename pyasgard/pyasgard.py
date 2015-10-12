@@ -222,9 +222,6 @@ class Asgard(object):  # pylint: disable=R0903
         if response.status_code == 401:
             raise AsgardAuthenticationError(response.reason)
 
-        if response.status_code == 401:
-            raise AsgardAuthenticationError(response.reason)
-
         if response.status_code != status:
             error = AsgardError(response.reason, response.status_code)
             logging.fatal(error)
