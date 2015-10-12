@@ -38,8 +38,10 @@ class AsgardError(Exception):
         return repr('%s: %s' % (self.error_code, self.msg))
 
 
-class AuthenticationError(AsgardError):
+class AsgardAuthenticationError(AsgardError):
+    """Failed authentication with Asgard API."""
     def __init__(self, msg):
+        super(AsgardAuthenticationError, self).__init__(msg)
         self.msg = msg
 
     def __str__(self):
@@ -195,6 +197,9 @@ class Asgard(object):
         # Just in case
         if response is None:
             raise AsgardError('Response Not Found')
+
+        if response.status_code == 401:
+            raise AsgardAuthenticationError(response.reason)
 
         if response.status_code != status:
             raise AsgardError(response.reason, response.status_code)
