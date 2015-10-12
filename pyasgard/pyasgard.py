@@ -4,6 +4,7 @@ __version__ = "1.0"
 import re
 import base64
 import logging
+from pprint import pformat
 
 try:
     import simplejson as json
@@ -111,12 +112,7 @@ class Asgard(object):
             # Body can be passed from data or in args
             body = kwargs.pop('data', None) or self.data
 
-            # Substitute mustache '{{}}' placeholders with data from keywords
-            url = re.sub(r'{{(?P<m>[a-zA-Z_]+)}}',
-                         # Optional pagination parameters will default to blank
-                         lambda m: '{}'.format(kwargs.pop(m.group(1), '')),
-                         '{}{}'.format(self.url, path))
-            logging.debug('url=%s', url)
+            url = self._format_url(path, kwargs)
 
             # Validate remaining kwargs against valid_params and add
             # params url encoded to url variable.
@@ -146,6 +142,20 @@ class Asgard(object):
 
         # Execute dynamic method and pass in keyword args as data to API call
         return call.__get__(self)
+
+    def _format_url(self, path, kwargs):
+        """Format request URL with endpoint mapping.
+
+        Substitute mustache '{{}}' placeholders with data from keywords.
+        """
+        logging.debug('kwargs before pop=%s', pformat(kwargs))
+        url = re.sub(r'{{(?P<m>[a-zA-Z_]+)}}',
+                     # Optional pagination parameters will default to blank
+                     lambda m: '{}'.format(kwargs.pop(m.group(1), '')),
+                     '{}{}'.format(self.url, path))
+        logging.debug('url=%s', url)
+        logging.debug('kwargs after pop=%s', pformat(kwargs))
+        return url
 
     @staticmethod
     def _response_handler(response, status):
