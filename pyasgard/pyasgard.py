@@ -34,6 +34,7 @@ class AsgardError(Exception):
 
 class AsgardAuthenticationError(AsgardError):
     """Failed authentication with Asgard API."""
+
     def __init__(self, msg):
         super(AsgardAuthenticationError, self).__init__(msg)
         self.msg = msg
@@ -161,6 +162,9 @@ class Asgard(object):  # pylint: disable=R0903
 
             return self._response_handler(response, status)
 
+        ##################
+        # Starting point #
+        ##################
         logging.debug('getattr locals():\n%s', pformat(locals()))
 
         # Missing method is also not defined in our mapping table
