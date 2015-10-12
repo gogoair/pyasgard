@@ -84,4 +84,6 @@ def test_success():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    pytest.main()
+    test_args = ['-v', '--cov=pyasgard', '--cov-report', 'term-missing',
+                 '--cov-report', 'html', __file__]
+    pytest.main(test_args)
