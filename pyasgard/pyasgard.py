@@ -44,7 +44,7 @@ class AsgardAuthenticationError(AsgardError):
 
 
 class Asgard(object):  # pylint: disable=R0903
-    """ Python API Wrapper for Asgard"""
+    """Python API Wrapper for Asgard."""
 
     def __init__(self,
                  url,
@@ -111,7 +111,7 @@ class Asgard(object):  # pylint: disable=R0903
         """
 
         def call(self, **kwargs):
-            """ """
+            """Request call to Asgard API."""
             logging.debug('call locals():\n%s', pformat(locals()))
 
             api_map = self.mapping_table[api_call]
