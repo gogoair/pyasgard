@@ -10,7 +10,7 @@ from string import Template
 
 import requests
 
-from endpoints import mapping_table as mapping_table
+from endpoints import MAPPING_TABLE
 
 
 def decrypt_hash(string):
@@ -86,7 +86,7 @@ class Asgard(object):  # pylint: disable=R0903
             }
 
         self.api_version = api_version
-        self.mapping_table = mapping_table
+        self.mapping_table = MAPPING_TABLE
 
     def __dir__(self):
         return self.__dict__.keys() + self.mapping_table.keys()

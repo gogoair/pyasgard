@@ -7,8 +7,8 @@ from pprint import pformat
 
 import pytest
 
+from pyasgard.endpoints import MAPPING_TABLE
 from pyasgard.pyasgard import Asgard, AsgardAuthenticationError, AsgardError
-from pyasgard.endpoints import mapping_table
 
 URL = 'http://asgard.example.com'
 
@@ -34,14 +34,14 @@ def test_url_formatter():
     assert test_url == 'http://test.com/test_region/region/list.json'
 
     test_url = test_asgard._format_url(  # pylint: disable=W0212
-        mapping_table['list_application_instances']['path'],
+        MAPPING_TABLE['list_application_instances']['path'],
         {'app_id': 'THIS'})
 
     assert test_url == 'http://test.com/test_region/instance/list/THIS.json'
 
     with pytest.raises(KeyError):
         test_url = test_asgard._format_url(  # pylint: disable=W0212
-            mapping_table['list_application_instances']['path'],
+            MAPPING_TABLE['list_application_instances']['path'],
             {'something': 'ELSE'})
 
 

@@ -1,8 +1,6 @@
-"""
-API MAPPING
-"""
-mapping_table = {
-    # Asgard API
+"""Asgard API mapping."""
+
+MAPPING_TABLE = {
     'list_regions': {
         'path': '/region/list.json',
         'method': 'GET',
