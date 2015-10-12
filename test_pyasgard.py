@@ -12,8 +12,8 @@ from pyasgard.pyasgard import Asgard, AsgardAuthenticationError, AsgardError
 try:
     from config import URL, ENC_PASSWD, USERNAME
 except ImportError:
-    URL = 'http://asgard.demo.com'
     ENC_PASSWD = 'dGVzdHBhc3N3ZA=='
+    URL = 'http://asgard.demo.com'
     USERNAME = 'happydog'
 
 
