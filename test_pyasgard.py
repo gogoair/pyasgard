@@ -7,40 +7,10 @@ from pprint import pformat
 
 import pytest
 
-from pyasgard.pyasgard import (Asgard, AsgardAuthenticationError, AsgardError,
-                               clean_kwargs)
+from pyasgard.pyasgard import Asgard, AsgardAuthenticationError, AsgardError
+from pyasgard.endpoints import mapping_table
 
 URL = 'http://asgard.example.com'
-
-
-def test_clean_kwargs():
-    """Testing functionality of pyasgard.pyasgard.clean_kwargs()."""
-    kwargs = {
-        'this': 'that',
-        'something': 'other',
-        'fun': 'time',
-        'eggs': ('humpty', 'dumpty'),
-        'fruits': ('apple', 'pear', 'orange'),
-        'books': ('the king and i', 'someone', 'peter pan', 'someone else'),
-        'mixed_set': ('one', 2, 'three', 4),
-        'mixed_list': (1, 2, 3, 'four', 'five'),
-        'mixed_dict': ('thing', 1, 2, 'thingy')
-    }
-    clean_kwargs(kwargs)
-
-    formatted_kwargs = {
-        'this': 'that',
-        'something': 'other',
-        'fun': 'time',
-        'eggs': 'humpty,dumpty',
-        'fruits': 'apple,pear,orange',
-        'books': 'the king and i,someone,peter pan,someone else',
-        'mixed_set': 'one,2,three,4',
-        'mixed_list': '1,2,3,four,five',
-        'mixed_dict': 'thing,1,2,thingy'
-    }
-
-    assert kwargs == formatted_kwargs
 
 
 def test_dir():
@@ -64,14 +34,15 @@ def test_url_formatter():
     assert test_url == 'http://test.com/test_region/region/list.json'
 
     test_url = test_asgard._format_url(  # pylint: disable=W0212
-        '/region/{{test}}/list.json', {'test': 'THIS'})
+        mapping_table['list_application_instances']['path'],
+        {'app_id': 'THIS'})
 
-    assert test_url == 'http://test.com/test_region/region/THIS/list.json'
+    assert test_url == 'http://test.com/test_region/instance/list/THIS.json'
 
-    test_url = test_asgard._format_url(  # pylint: disable=W0212
-        '/region/{{test}}/list.json', {'something': 'ELSE'})
-
-    assert test_url == 'http://test.com/test_region/region//list.json'
+    with pytest.raises(KeyError):
+        test_url = test_asgard._format_url(  # pylint: disable=W0212
+            mapping_table['list_application_instances']['path'],
+            {'something': 'ELSE'})
 
 
 def test_authentication_errors():
@@ -112,4 +83,5 @@ def test_success():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
     pytest.main()
