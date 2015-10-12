@@ -169,6 +169,9 @@ class Asgard(object):  # pylint: disable=R0903
 
             return self._response_handler(response, status)
 
+
+
+        ### Starting point ###
         logging.debug('Looking up %s', api_call)
         # Missing method is also not defined in our mapping table
         if api_call not in self.mapping_table:
