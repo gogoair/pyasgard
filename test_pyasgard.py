@@ -2,7 +2,6 @@
 """Unit testing for pyasgard."""
 import logging
 import pickle
-from base64 import b64encode
 from pprint import pformat
 
 import pytest
@@ -10,7 +9,12 @@ import pytest
 from pyasgard.endpoints import MAPPING_TABLE
 from pyasgard.pyasgard import Asgard, AsgardAuthenticationError, AsgardError
 
-URL = 'http://asgard.example.com'
+try:
+    from config import URL, ENC_PASSWD, USERNAME
+except ImportError:
+    URL = 'http://asgard.demo.com'
+    ENC_PASSWD = 'dGVzdHBhc3N3ZA=='
+    USERNAME = 'happydog'
 
 
 def test_dir():
@@ -52,31 +56,31 @@ def test_authentication_errors():
         asgard.show_instance(instance_id='i21bcfec8')
 
     with pytest.raises(AsgardAuthenticationError):
-        asgard = Asgard(URL, username='not_devops')
+        asgard = Asgard(URL, username='not_user')
         asgard.show_instance(instance_id='i21bcfec8')
 
 
 def test_asgard_error():
     """Make sure AsgardError triggers appropriately."""
     with pytest.raises(AsgardError):
-        asgard = Asgard(URL, username='devops', password=b64encode('*PASSWORD*'))
+        asgard = Asgard(URL, username=USERNAME, password=ENC_PASSWD)
         asgard.show_instance(instance_id='sjdlkjf')
 
 
 def test_builtin_errors():
     """Check that builtin errors trigger with bad formats."""
     with pytest.raises(TypeError):
-        asgard = Asgard(URL, username='devops', password='bad_password')
+        asgard = Asgard(URL, username=USERNAME, password='bad_password')
         asgard.show_instance(instance_id='i21bcfec8')
 
     with pytest.raises(AttributeError):
-        asgard = Asgard(URL, username='devops', password=b64encode('*PASSWORD*'))
+        asgard = Asgard(URL, username=USERNAME, password=ENC_PASSWD)
         asgard.list()
 
 
 def test_success():
     """Make sure that basic good call works."""
-    asgard = Asgard(URL, username='devops', password=b64encode('*PASSWORD*'))
+    asgard = Asgard(URL, username=USERNAME, password=ENC_PASSWD)
     response = asgard.list_regions()
     with open('pickles/regions.pickle', 'r') as regions_pickle:
         assert response == pickle.load(regions_pickle)
@@ -84,6 +88,6 @@ def test_success():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    test_args = ['-v', '--cov=pyasgard', '--cov-report', 'term-missing',
+    TEST_ARGS = ['-v', '--cov=pyasgard', '--cov-report', 'term-missing',
                  '--cov-report', 'html', __file__]
-    pytest.main(test_args)
+    pytest.main(TEST_ARGS)
