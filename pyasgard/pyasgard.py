@@ -83,7 +83,6 @@ class Asgard(object):  # pylint: disable=R0903
         if self.headers is None:
             self.headers = {
                 'User-agent': 'Asgard Python Library v%s' % __version__,
-                'Content-Type': 'application/json'
             }
 
         self.api_version = api_version
@@ -140,9 +139,17 @@ class Asgard(object):  # pylint: disable=R0903
                                     "'%s'" % (api_call, keyword))
 
             # Make an http request (data replacements are finalized)
+
+            method = method.lower()
+
+            if method == 'get':
+                action = 'params'
+            else:
+                action = 'data'
+
             url_params = {
                 'url': url,
-                'data': body,
+                action: body,
                 'headers': self.headers,
                 'timeout': 15,
             }
