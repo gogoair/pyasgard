@@ -5,6 +5,7 @@ __version__ = "1.0"
 import base64
 import logging
 from pprint import pformat
+from string import Template
 
 import requests
 
@@ -114,7 +115,13 @@ class Asgard(object):  # pylint: disable=R0903
             api_map = self.mapping_table[api_call]
             logging.debug(pformat(api_map))
 
-            path = api_map['path']
+            raw_path = api_map['path']
+
+            # get keys parsed
+            path_keys = [param[2] for param in Template.pattern.findall(raw_path)]
+
+            # Substitute mustache '{}' placeholders with data from keywords
+            path = Template(raw_path).substitute(kwargs)
             method = api_map['method']
             status = api_map['status']
             valid_params = api_map.get('valid_params', ())
@@ -122,12 +129,12 @@ class Asgard(object):  # pylint: disable=R0903
             # Body can be passed from data or in args
             body = kwargs.pop('data', None) or self.data
 
-            # Substitute mustache '{}' placeholders with data from keywords
-            # Optional pagination parameters will default to blank
-            if '{}' in path and 'oid' not in kwargs:
-                raise AsgardError('Must specify `oid` parameter.')
+            # remove ${} parameter from url, so its not added to querystring
+            for param in path_keys:
+                logging.debug('Removing url param: {}'.format(param))
+                kwargs.pop(param)
 
-            url = (self.url + path).format(kwargs.pop('oid', None))
+            url = '{}{}'.format(self.url, path)
             logging.debug(url)
 
             # Validate remaining kwargs against valid_params and add
