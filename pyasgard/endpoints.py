@@ -41,4 +41,9 @@ MAPPING_TABLE = {
         'method': 'GET',
         'status': 200,
     },
+    'list_launchconfigs': {
+        'path': '/launchConfiguration/list.json',
+        'method': 'GET',
+        'status': 200,
+    },
 }
