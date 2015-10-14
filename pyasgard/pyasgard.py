@@ -76,7 +76,7 @@ class Asgard(object):  # pylint: disable=R0903
         log = logging.getLogger(__name__)
         log.debug('init locals():\n%s', pformat(locals()))
 
-        self.data = None
+        self.data = {}
         self.url = '{}/{}'.format(url.rstrip('/'), ec2_region)
         self.username = username
         self.password = password
@@ -126,10 +126,6 @@ class Asgard(object):  # pylint: disable=R0903
             valid_params = api_map.get('valid_params', ())
             log.log(15, 'valid_params=%s', valid_params)
 
-            # Body can be passed from data or in args
-            body = kwargs.pop('data', None) or self.data
-            log.log(15, 'body=%s', body)
-
             url = self._format_url(api_map['path'], kwargs)
 
             # Validate remaining kwargs against valid_params and add
@@ -138,6 +134,13 @@ class Asgard(object):  # pylint: disable=R0903
                 if keyword not in valid_params:
                     raise TypeError("%s() got an unexpected keyword argument "
                                     "'%s'" % (api_call, keyword))
+
+            # Body can be passed from data or in args
+            body = {}
+            body.update(api_map.get('default_params', {}))
+            body.update(kwargs.pop('data', None) or self.data)
+            body.update(kwargs)
+            log.log(15, 'body=%s', body)
 
             if method == 'GET':
                 action = 'params'
