@@ -240,6 +240,10 @@ class Asgard(object):  # pylint: disable=R0903
 
         # Deserialize json content if content exist. In some cases Asgard
         # returns ' ' strings. Also return false non strings (0, [], (), {})
-        response_json = response.json()
-        log.debug('Response JSON:\n%s', pformat(response_json))
-        return response_json
+        try:
+            response_json = response.json()
+            log.debug('Response JSON:\n%s', pformat(response_json))
+            return response_json
+        except ValueError:
+            log.debug('Response HTML:\n%s', response.text)
+            return response.text
