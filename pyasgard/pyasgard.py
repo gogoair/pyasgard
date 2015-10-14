@@ -15,8 +15,10 @@ from endpoints import MAPPING_TABLE
 
 def decrypt_hash(string):
     """Decrypt the encrypted password string."""
+    log = logging.getLogger(__name__)
+
     string = base64.b64decode(string)
-    logging.debug('Password decrypted.')
+    log.debug('Password decrypted.')
     return string
 
 
@@ -71,7 +73,8 @@ class Asgard(object):  # pylint: disable=R0903
             or a common one is to disable SSL certficate validation
             {"disable_ssl_certificate_validation": True}
         """
-        logging.debug('init locals():\n%s', pformat(locals()))
+        log = logging.getLogger(__name__)
+        log.debug('init locals():\n%s', pformat(locals()))
 
         self.data = None
         self.url = '{}/{}'.format(url.rstrip('/'), ec2_region)
@@ -109,26 +112,28 @@ class Asgard(object):  # pylint: disable=R0903
         TODO:
             Should probably url-encode GET query parameters on replacement
         """
+        log = logging.getLogger(__name__)
 
         def call(self, **kwargs):
             """Request call to Asgard API."""
-            logging.debug('call locals():\n%s', pformat(locals()))
+            log.debug('call locals():\n%s', pformat(locals()))
 
             api_map = self.mapping_table[api_call]
-            logging.debug('api_map:\n%s', pformat(api_map))
+            log.debug('api_map:\n%s', pformat(api_map))
 
             method = api_map['method']
             status = api_map['status']
             valid_params = api_map.get('valid_params', ())
-            logging.debug('valid_params=%s', valid_params)
+            log.log(15, 'valid_params=%s', valid_params)
+
             # Body can be passed from data or in args
             body = kwargs.pop('data', None) or self.data
+            log.log(15, 'body=%s', body)
 
             url = self._format_url(api_map['path'], kwargs)
 
             # Validate remaining kwargs against valid_params and add
             # params url encoded to url variable.
-            logging.debug(kwargs)
             for keyword in kwargs:
                 if keyword not in valid_params:
                     raise TypeError("%s() got an unexpected keyword argument "
@@ -151,21 +156,21 @@ class Asgard(object):  # pylint: disable=R0903
                 url_params.update(auth)
 
             # Make an http request (data replacements are finalized)
-            logging.debug(
-                'getattr(%s, %s)(%s)\n[auth] redacted', requests,
+            log.log(
+                15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
                 method.lower(), pformat({
                     key: value
                     for key, value in url_params.items() if key != 'auth'
                 }))
             response = getattr(requests, method.lower())(**url_params)
-            logging.debug(pformat(inspect.getmembers(response)))
+            log.debug(pformat(inspect.getmembers(response)))
 
             return self._response_handler(response, status)
 
         ##################
         # Starting point #
         ##################
-        logging.debug('getattr locals():\n%s', pformat(locals()))
+        log.debug('getattr locals():\n%s', pformat(locals()))
 
         # Missing method is also not defined in our mapping table
         if api_call not in self.mapping_table:
@@ -179,27 +184,29 @@ class Asgard(object):  # pylint: disable=R0903
 
         Substitute mustache '{{}}' placeholders with data from keywords.
         """
-        logging.debug('URL formatter locals:\n%s', pformat(locals()))
+        log = logging.getLogger(__name__)
+        log.debug('URL formatter locals:\n%s', pformat(locals()))
+
         # get keys parsed
         path_keys = [param[2] for param in Template.pattern.findall(path)]
-        logging.debug('Template find=%s', Template.pattern.findall(path))
-        logging.debug('path_keys=%s', path_keys)
+        log.debug('Template find=%s', Template.pattern.findall(path))
+        log.debug('path_keys=%s', path_keys)
 
         # Substitute mustache '{}' placeholders with data from keywords
         substitute_path = Template(path).substitute(kwargs)
-        logging.debug('substitute_path=%s', substitute_path)
+        log.debug('substitute_path=%s', substitute_path)
 
-        logging.debug('kwargs before pop=%s', pformat(kwargs))
+        log.debug('kwargs before pop=%s', pformat(kwargs))
 
         # remove ${} parameter from url, so its not added to querystring
         for param in path_keys:
-            logging.debug('Removing url param: %s', param)
+            log.debug('Removing url param: %s', param)
             kwargs.pop(param)
 
-        logging.debug('kwargs after pop=%s', pformat(kwargs))
+        log.debug('kwargs after pop=%s', pformat(kwargs))
 
         url = '{}{}'.format(self.url, substitute_path)
-        logging.debug('url=%s', url)
+        log.log(15, 'url=%s', url)
 
         return url
 
@@ -211,14 +218,16 @@ class Asgard(object):  # pylint: disable=R0903
         If the response status is different from status defined in the
         mapping table, then we assume an error and raise proper exception
         """
-        logging.debug('Expected response status: %s', status)
-        logging.debug('Request response:\n%s',
-                      pformat(inspect.getmembers(response)))
+        log = logging.getLogger(__name__)
+
+        log.debug('Expected response status: %s', status)
+        log.debug('Request response:\n%s',
+                  pformat(inspect.getmembers(response)))
 
         # Just in case
         if response is None:
             message = 'Response Not Found'
-            logging.error(message)
+            log.error(message)
             raise AsgardError(message)
 
         if response.status_code == 401:
@@ -226,11 +235,11 @@ class Asgard(object):  # pylint: disable=R0903
 
         if response.status_code != status:
             error = AsgardError(response.reason, response.status_code)
-            logging.fatal(error)
+            log.fatal(error)
             raise error
 
         # Deserialize json content if content exist. In some cases Asgard
         # returns ' ' strings. Also return false non strings (0, [], (), {})
         response_json = response.json()
-        logging.debug('Response JSON:\n%s', pformat(response_json))
+        log.debug('Response JSON:\n%s', pformat(response_json))
         return response_json
