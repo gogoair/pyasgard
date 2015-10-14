@@ -16,6 +16,8 @@ except ImportError:
     URL = 'http://asgard.demo.com'
     USERNAME = 'happydog'
 
+ASGARD = Asgard(URL, username=USERNAME, password=ENC_PASSWD)
+
 
 def test_dir():
     """Test Asgard.__dir__ contains all attributes and dynamic endpoints."""
@@ -84,6 +86,50 @@ def test_success():
     response = asgard.list_regions()
     with open('pickles/regions.pickle', 'r') as regions_pickle:
         assert response == pickle.load(regions_pickle)
+
+
+def test_applications():
+    """Check Applications are working."""
+    log = logging.getLogger(__name__)
+
+    test_description = 'Testing this out.'
+
+    pre_response = ASGARD.list_applications()
+
+    ASGARD.create_application(description=test_description)
+
+    post_response = ASGARD.list_applications()
+
+    new_application = []
+    for app in post_response:
+        pre_apps = [pre_app['name'] for pre_app in pre_response]
+        log.debug('pre_apps=%s', pre_apps)
+
+        log.debug('app name=%s', app['name'])
+        if app['name'] not in pre_apps:
+            new_application.append(app)
+
+    log.debug('new_application=%s', new_application)
+
+    assert len(new_application) == 1
+
+    new_application = new_application[0]
+
+    assert new_application[
+        'name'
+    ] == MAPPING_TABLE['create_application']['default_params']['name']
+
+    check_app = ASGARD.show_application(app_name=new_application['name'])
+    logging.debug('check_app:\n%s', pformat(check_app))
+    assert check_app['app']['description'] == test_description
+
+
+def test_mappings():
+    """Check mapping table has at minimum _method_, _path_, and _status_"""
+    for values in MAPPING_TABLE.values():
+        assert 'method' in values
+        assert 'path' in values
+        assert 'status' in values
 
 
 if __name__ == '__main__':

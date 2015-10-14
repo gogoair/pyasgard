@@ -11,6 +11,31 @@ MAPPING_TABLE = {
         'method': 'GET',
         'status': 200,
     },
+    'list_applications': {
+        'path': '/application/list.json',
+        'method': 'GET',
+        'status': 200,
+    },
+    'show_application': {
+        'path': '/application/show/${app_name}.json',
+        'method': 'GET',
+        'status': 200,
+    },
+    'create_application': {
+        'path': '/application/save',
+        'method': 'POST',
+        'status': 200,
+        'valid_params': ['name', 'group', 'description', 'owner', 'email'],
+        'default_params': {
+            'name': 'unneccessary',
+            'group': 'Replaceable',
+            'type': 'Web Service',
+            'description': 'Poor description.',
+            'owner': 'Bashful',
+            'email': 'invalid@gogoair.com',
+            'monitorBucketType': 'none'
+        },
+    },
     'list_application_instances': {
         'path': '/instance/list/${app_id}.json',
         'method': 'GET',
