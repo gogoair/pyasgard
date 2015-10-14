@@ -46,4 +46,12 @@ MAPPING_TABLE = {
         'method': 'GET',
         'status': 200,
     },
+    'show_launchconfig': {
+        'path': '/launchConfiguration/show/${config_name}.json',
+        'method': 'GET',
+        'status': 200,
+    },
+    # 'delete_launchconfig': {
+    # Not available
+    # },
 }
