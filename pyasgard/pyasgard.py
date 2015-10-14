@@ -179,8 +179,10 @@ class Asgard(object):  # pylint: disable=R0903
 
         Substitute mustache '{{}}' placeholders with data from keywords.
         """
+        logging.debug('URL formatter locals:\n%s', pformat(locals()))
         # get keys parsed
         path_keys = [param[2] for param in Template.pattern.findall(path)]
+        logging.debug('Template find=%s', Template.pattern.findall(path))
         logging.debug('path_keys=%s', path_keys)
 
         # Substitute mustache '{}' placeholders with data from keywords
