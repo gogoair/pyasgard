@@ -10,7 +10,7 @@ from string import Template
 
 import requests
 
-from endpoints import MAPPING_TABLE
+from pyasgard.endpoints import MAPPING_TABLE
 
 
 class AsgardError(Exception):
