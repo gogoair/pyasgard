@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Unit testing for pyasgard."""
 import logging
-import pickle
 from pprint import pformat
 
 import pytest
@@ -84,8 +83,7 @@ def test_success():
     """Make sure that basic good call works."""
     asgard = Asgard(URL, username=USERNAME, password=ENC_PASSWD)
     response = asgard.list_regions()
-    with open('pickles/regions.pickle', 'r') as regions_pickle:
-        assert response == pickle.load(regions_pickle)
+    assert 'us-east-1' in [region['code'] for region in response]
 
 
 def test_applications():
