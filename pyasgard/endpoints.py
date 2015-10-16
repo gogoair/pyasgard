@@ -92,4 +92,11 @@ MAPPING_TABLE = {
         'default_params': {'name': 'replaceme',
                            '_action_delete': ''},
     },
+    'mass_delete_launchconfigs': {
+        'path': '/launchConfiguration/index',
+        'method': 'POST',
+        'status': 200,
+        'default_params': {'daysAgo': 10,
+                           '_action_massDelete': ''},
+    }
 }
