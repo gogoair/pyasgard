@@ -47,22 +47,27 @@ class Asgard(object):  # pylint: disable=R0903
                  # client_args={},
                  api_version=1,
                  ec2_region='us-east-1'):
-        """
+        """New Asgard object for interacting with the API.
+
         Instantiates an instance of Asgard. Takes optional parameters for
         HTTP Basic Authentication
 
         Parameters:
-        url - https://company.asgard.com (use http if not SSL enabled)
-        username - Specific to your asgard account (typically email)
-        password - (b64encode(str)) Specific to your asgard account or your
-            account's API token if use_api_token is True
-        use_api_token - use api token for authentication instead of user's
-            actual password
-        headers - Pass headers in dict form. This will override default.
-        client_args - Pass arguments to http client in dict form.
-            {'cache': False, 'timeout': 2}
-            or a common one is to disable SSL certficate validation
-            {"disable_ssl_certificate_validation": True}
+            url: https://company.asgard.com (use http if not SSL enabled).
+            username: Specific to your asgard account.
+            password: (b64encode(bytes)) Specific to your asgard account or
+                your account's API token if use_api_token is True.
+            headers: Pass headers in dict form, overrides default headers.
+            api_version: Version number of Asgard API to use.
+            ec2_region: AWS region to use.
+
+        Not Implemented:
+            use_api_token: Use api token for authentication instead of user's
+                actual password.
+            client_args: Pass arguments to http client in dict form.
+                {'cache': False, 'timeout': 2}
+                or a common one is to disable SSL certficate validation
+                {"disable_ssl_certificate_validation": True}
         """
         self.log = logging.getLogger(__name__)
         self.log.debug('init locals():\n%s', pformat(locals()))
@@ -83,7 +88,14 @@ class Asgard(object):  # pylint: disable=R0903
         self.mapping_table = MAPPING_TABLE
 
     def decrypt_hash(self, password):
-        """Decrypt the encrypted password string."""
+        """Decrypt the encrypted password string.
+
+        Args:
+            password: String that has been encoded using b64encode(bytes).
+
+        Returns:
+            Decrypted password string.
+        """
         password = base64.b64decode(password.encode('ascii'))
         self.log.debug('Password decrypted.')
         return password.decode()
@@ -94,26 +106,46 @@ class Asgard(object):  # pylint: disable=R0903
         return self_keys + map_keys
 
     def __getattr__(self, api_call):
-        """
-        Instead of writing out each API endpoint as a method here or
-        binding the API endpoints at instance runttime, we can simply
-        use an elegant Python technique to construct method execution on-
-        demand. We simply provide a mapping table between Asgard API calls
-        and function names (with necessary parameters to replace
-        embedded keywords on GET or json data on POST/PUT requests).
+        """Dynamic construction of attributes based on endpoint mapping table.
 
-        __getattr__() is used as callback method implemented so that
-        when an object tries to call a method which is not defined here,
-        it looks to find a relationship in the the mapping table.  The
-        table provides the structure of the API call and parameters passed
-        in the method will populate missing data.
+        Instead of writing out each API endpoint as a method here or binding
+        the API endpoints at instance runttime, we can simply use an elegant
+        Python technique to construct method execution on- demand. We simply
+        provide a mapping table between Asgard API calls and function names
+        (with necessary parameters to replace embedded keywords on GET or json
+        data on POST/PUT requests).
+
+        __getattr__() is used as callback method implemented so that when an
+        object tries to call a method which is not defined here, it looks to
+        find a relationship in the the mapping table.  The table provides the
+        structure of the API call and parameters passed in the method will
+        populate missing data.
+
+        Raises:
+            AttributeError: Attribute is not part of the mapping table.
+
+        Returns:
+            Dict representation of HTML or JSON returned from Asgard API.
 
         TODO:
             Should probably url-encode GET query parameters on replacement
         """
 
         def call(self, **kwargs):
-            """Request call to Asgard API."""
+            """Request call to Asgard API.
+
+            This constructs the outgoing request to your Asgard Server.
+
+            Args:
+                **kwargs: Only excepts keywords used in the endpoint mapping
+                    _path_, _valid_params_, and _default_params_.
+
+            Returns:
+                A dict of the HTML or JSON from Asgard.
+
+            Raises:
+                TypeError: If an unexpected keyword was passed in.
+            """
             self.log.debug('call locals():\n%s', pformat(locals()))
 
             api_map = self.mapping_table[api_call]
@@ -186,7 +218,16 @@ class Asgard(object):  # pylint: disable=R0903
     def _format_url(self, path, kwargs):
         """Format request URL with endpoint mapping.
 
-        Substitute mustache '{{}}' placeholders with data from keywords.
+        Substitute `${}` placeholders with data from keywords. This removes the
+        key from the dict to prevent reuse in parameters.
+
+        Args:
+            path: URL path string to use, e.g. /application
+            kwargs: Dict containing any keys that need to be substituted in
+                _path_.
+
+        Returns:
+            Fully constructed URL string with substitutions in place.
         """
         self.log.debug('URL formatter locals:\n%s', pformat(locals()))
 
@@ -219,6 +260,19 @@ class Asgard(object):  # pylint: disable=R0903
 
         If the response status is different from status defined in the
         mapping table, then we assume an error and raise proper exception
+
+        Args:
+            response: A requests.Response object from making request to Asgard
+                API.
+            status: Expected status integer.
+
+        Returns:
+            A dict mapping representation of the HTML or JSON returned from
+            Asgard API call.
+
+        Raises:
+            AsgardError: Response is missing or status code is not expected.
+            AsgardAuthenticationError: Asgard reported bad authentication.
         """
 
         self.log.debug('Expected response status: %s', status)
