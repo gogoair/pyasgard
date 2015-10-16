@@ -68,7 +68,7 @@ class Asgard(object):  # pylint: disable=R0903
         self.log.debug('init locals():\n%s', pformat(locals()))
 
         self.data = {}
-        self.url = '{}/{}'.format(url.rstrip('/'), ec2_region)
+        self.url = '{0}/{1}'.format(url.rstrip('/'), ec2_region)
         self.username = username
         self.password = password
 
@@ -155,16 +155,17 @@ class Asgard(object):  # pylint: disable=R0903
             }
 
             if self.username and self.password:
-                auth = {'auth': (self.username, self.decrypt_hash(self.password))}
+                auth = {
+                    'auth': (self.username, self.decrypt_hash(self.password))
+                }
                 url_params.update(auth)
 
             # Make an http request (data replacements are finalized)
             self.log.log(
                 15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
-                method.lower(), pformat({
-                    key: value
-                    for key, value in url_params.items() if key != 'auth'
-                }))
+                method.lower(),
+                pformat(dict((key, value) for key, value in url_params.items()
+                             if key != 'auth')))
             response = getattr(requests, method.lower())(**url_params)
             self.log.debug(pformat(inspect.getmembers(response)))
 
@@ -207,7 +208,7 @@ class Asgard(object):  # pylint: disable=R0903
 
         self.log.debug('kwargs after pop=%s', pformat(kwargs))
 
-        url = '{}{}'.format(self.url, substitute_path)
+        url = '{0}{1}'.format(self.url, substitute_path)
         self.log.log(15, 'url=%s', url)
 
         return url
@@ -222,7 +223,7 @@ class Asgard(object):  # pylint: disable=R0903
 
         self.log.debug('Expected response status: %s', status)
         self.log.debug('Request response:\n%s',
-                  pformat(inspect.getmembers(response)))
+                       pformat(inspect.getmembers(response)))
 
         # Just in case
         if response is None:
