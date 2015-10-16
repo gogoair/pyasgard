@@ -1,5 +1,12 @@
 #!/usr/bin/env python
-"""Unit testing for pyasgard."""
+"""Unit testing for pyasgard.
+
+`config.py` can be used for storing custom parameters::
+
+    ENC_PASSWD = 'dGVzdHBhc3N3ZA=='
+    URL = 'http://asgard.demo.com'
+    USERNAME = 'happydog'
+"""
 import logging
 from pprint import pformat
 
