@@ -76,7 +76,11 @@ MAPPING_TABLE = {
         'method': 'GET',
         'status': 200,
     },
-    # 'delete_launchconfig': {
-    # Not available
-    # },
+    'delete_launchconfig': {
+        'path': '/launchConfiguration/index',
+        'method': 'POST',
+        'status': 200,
+        'default_params': {'name': 'replaceme',
+                           '_action_delete': ''},
+    },
 }
