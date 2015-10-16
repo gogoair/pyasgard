@@ -36,6 +36,15 @@ MAPPING_TABLE = {
             'monitorBucketType': 'none'
         },
     },
+    'delete_application': {
+        'path': '/application/save',
+        'method': 'POST',
+        'status': 200,
+        'default_params': {
+            'name': 'unnecessary',
+            '_action_delete': '',
+        },
+    },
     'list_application_instances': {
         'path': '/instance/list/${app_id}.json',
         'method': 'GET',

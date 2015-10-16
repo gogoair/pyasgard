@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """Unit testing for pyasgard."""
 import logging
-import pickle
 from pprint import pformat
 
 import pytest
@@ -72,7 +71,7 @@ def test_asgard_error():
 def test_builtin_errors():
     """Check that builtin errors trigger with bad formats."""
     with pytest.raises(TypeError):
-        asgard = Asgard(URL, username=USERNAME, password='bad_password')
+        asgard = Asgard(URL, username=USERNAME, password=ENC_PASSWD, data={'bad': 'param'})
         asgard.show_instance(instance_id='i21bcfec8')
 
     with pytest.raises(AttributeError):
@@ -84,19 +83,19 @@ def test_success():
     """Make sure that basic good call works."""
     asgard = Asgard(URL, username=USERNAME, password=ENC_PASSWD)
     response = asgard.list_regions()
-    with open('pickles/regions.pickle', 'r') as regions_pickle:
-        assert response == pickle.load(regions_pickle)
+    assert 'us-east-1' in [region['code'] for region in response]
 
 
 def test_applications():
     """Check Applications are working."""
     log = logging.getLogger(__name__)
 
+    test_name = 'pyasgard_test'
     test_description = 'Testing this out.'
 
     pre_response = ASGARD.list_applications()
 
-    ASGARD.create_application(description=test_description)
+    ASGARD.create_application(name=test_name, description=test_description)
 
     post_response = ASGARD.list_applications()
 
@@ -115,13 +114,18 @@ def test_applications():
 
     new_application = new_application[0]
 
-    assert new_application[
-        'name'
-    ] == MAPPING_TABLE['create_application']['default_params']['name']
+    assert new_application['name'] == test_name
+    assert new_application['description'] == test_description
 
-    check_app = ASGARD.show_application(app_name=new_application['name'])
-    logging.debug('check_app:\n%s', pformat(check_app))
-    assert check_app['app']['description'] == test_description
+    check_app_exists = ASGARD.show_application(app_name=test_name)
+    logging.debug('check_app:\n%s', pformat(check_app_exists))
+    assert check_app_exists['app']['description'] == test_description
+
+    ASGARD.delete_application(name=test_name)
+
+    with pytest.raises(AsgardError):
+        check_app_deleted = ASGARD.show_application(app_name=test_name)
+        logging.debug('check_app:\n%s', pformat(check_app_deleted))
 
 
 def test_mappings():

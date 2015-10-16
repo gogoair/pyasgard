@@ -10,7 +10,7 @@ from string import Template
 
 import requests
 
-from pyasgard.endpoints import MAPPING_TABLE
+from .endpoints import MAPPING_TABLE
 
 
 class AsgardError(Exception):
@@ -68,7 +68,7 @@ class Asgard(object):  # pylint: disable=R0903
         self.log.debug('init locals():\n%s', pformat(locals()))
 
         self.data = {}
-        self.url = '{}/{}'.format(url.rstrip('/'), ec2_region)
+        self.url = '{0}/{1}'.format(url.rstrip('/'), ec2_region)
         self.username = username
         self.password = password
 
@@ -82,14 +82,16 @@ class Asgard(object):  # pylint: disable=R0903
         self.api_version = api_version
         self.mapping_table = MAPPING_TABLE
 
-    def decrypt_hash(self, string):
+    def decrypt_hash(self, password):
         """Decrypt the encrypted password string."""
-        string = base64.b64decode(string)
+        password = base64.b64decode(password.encode('ascii'))
         self.log.debug('Password decrypted.')
-        return string
+        return password.decode()
 
     def __dir__(self):
-        return self.__dict__.keys() + self.mapping_table.keys()
+        self_keys = [key for key in self.__dict__.keys()]
+        map_keys = [key for key in self.mapping_table.keys()]
+        return self_keys + map_keys
 
     def __getattr__(self, api_call):
         """
@@ -127,7 +129,9 @@ class Asgard(object):  # pylint: disable=R0903
             # Validate remaining kwargs against valid_params and add
             # params url encoded to url variable.
             for keyword in kwargs:
-                if keyword not in valid_params:
+                if keyword not in valid_params and keyword not in api_map[
+                        'default_params'
+                ]:
                     raise TypeError("%s() got an unexpected keyword argument "
                                     "'%s'" % (api_call, keyword))
 
@@ -151,16 +155,17 @@ class Asgard(object):  # pylint: disable=R0903
             }
 
             if self.username and self.password:
-                auth = {'auth': (self.username, self.decrypt_hash(self.password))}
+                auth = {
+                    'auth': (self.username, self.decrypt_hash(self.password))
+                }
                 url_params.update(auth)
 
             # Make an http request (data replacements are finalized)
             self.log.log(
                 15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
-                method.lower(), pformat({
-                    key: value
-                    for key, value in url_params.items() if key != 'auth'
-                }))
+                method.lower(),
+                pformat(dict((key, value) for key, value in url_params.items()
+                             if key != 'auth')))
             response = getattr(requests, method.lower())(**url_params)
             self.log.debug(pformat(inspect.getmembers(response)))
 
@@ -203,7 +208,7 @@ class Asgard(object):  # pylint: disable=R0903
 
         self.log.debug('kwargs after pop=%s', pformat(kwargs))
 
-        url = '{}{}'.format(self.url, substitute_path)
+        url = '{0}{1}'.format(self.url, substitute_path)
         self.log.log(15, 'url=%s', url)
 
         return url
@@ -218,7 +223,7 @@ class Asgard(object):  # pylint: disable=R0903
 
         self.log.debug('Expected response status: %s', status)
         self.log.debug('Request response:\n%s',
-                  pformat(inspect.getmembers(response)))
+                       pformat(inspect.getmembers(response)))
 
         # Just in case
         if response is None:
