@@ -1,1 +1,2 @@
-__all__ = ['pyasgard', 'endpoints']
+from .pyasgard import *
+from .endpoints import *
