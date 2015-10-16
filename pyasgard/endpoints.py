@@ -85,6 +85,26 @@ MAPPING_TABLE = {
         'method': 'GET',
         'status': 200,
     },
+    'list_elb': {
+        'path': '/loadBalancer/list.json',
+        'method': 'GET',
+        'status': 200,
+    },
+    'server_uptime': {
+        'path': '/server/uptime',
+        'method': 'GET',
+        'status': 200,
+    },
+    'server_ip': {
+        'path': '/server/ip',
+        'method': 'GET',
+        'status': 200,
+    },
+    'server_build': {
+        'path': '/server/build',
+        'method': 'GET',
+        'status': 200,
+    },
     # 'delete_launchconfig': {
     # Not available
     # },
