@@ -82,14 +82,16 @@ class Asgard(object):  # pylint: disable=R0903
         self.api_version = api_version
         self.mapping_table = MAPPING_TABLE
 
-    def decrypt_hash(self, string):
+    def decrypt_hash(self, password):
         """Decrypt the encrypted password string."""
-        string = base64.b64decode(string)
+        password = base64.b64decode(password.encode('ascii'))
         self.log.debug('Password decrypted.')
-        return string
+        return password.decode()
 
     def __dir__(self):
-        return self.__dict__.keys() + self.mapping_table.keys()
+        self_keys = [key for key in self.__dict__.keys()]
+        map_keys = [key for key in self.mapping_table.keys()]
+        return self_keys + map_keys
 
     def __getattr__(self, api_call):
         """
