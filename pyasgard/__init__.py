@@ -1,2 +1,1 @@
-from pyasgard.pyasgard import *
-from pyasgard.endpoints import *
+__all__ = ['pyasgard', 'endpoints']
