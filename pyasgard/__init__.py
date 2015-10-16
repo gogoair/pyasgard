@@ -1,2 +1,2 @@
-from pyasgard import *
-from endpoints import *
+from pyasgard.pyasgard import *
+from pyasgard.endpoints import *

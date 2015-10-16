@@ -10,16 +10,7 @@ from string import Template
 
 import requests
 
-from endpoints import MAPPING_TABLE
-
-
-def decrypt_hash(string):
-    """Decrypt the encrypted password string."""
-    log = logging.getLogger(__name__)
-
-    string = base64.b64decode(string)
-    log.debug('Password decrypted.')
-    return string
+from pyasgard.endpoints import MAPPING_TABLE
 
 
 class AsgardError(Exception):
@@ -73,8 +64,8 @@ class Asgard(object):  # pylint: disable=R0903
             or a common one is to disable SSL certficate validation
             {"disable_ssl_certificate_validation": True}
         """
-        log = logging.getLogger(__name__)
-        log.debug('init locals():\n%s', pformat(locals()))
+        self.log = logging.getLogger(__name__)
+        self.log.debug('init locals():\n%s', pformat(locals()))
 
         self.data = {}
         self.url = '{}/{}'.format(url.rstrip('/'), ec2_region)
@@ -90,6 +81,12 @@ class Asgard(object):  # pylint: disable=R0903
 
         self.api_version = api_version
         self.mapping_table = MAPPING_TABLE
+
+    def decrypt_hash(self, string):
+        """Decrypt the encrypted password string."""
+        string = base64.b64decode(string)
+        self.log.debug('Password decrypted.')
+        return string
 
     def __dir__(self):
         return self.__dict__.keys() + self.mapping_table.keys()
@@ -112,19 +109,18 @@ class Asgard(object):  # pylint: disable=R0903
         TODO:
             Should probably url-encode GET query parameters on replacement
         """
-        log = logging.getLogger(__name__)
 
         def call(self, **kwargs):
             """Request call to Asgard API."""
-            log.debug('call locals():\n%s', pformat(locals()))
+            self.log.debug('call locals():\n%s', pformat(locals()))
 
             api_map = self.mapping_table[api_call]
-            log.debug('api_map:\n%s', pformat(api_map))
+            self.log.debug('api_map:\n%s', pformat(api_map))
 
             method = api_map['method']
             status = api_map['status']
             valid_params = api_map.get('valid_params', ())
-            log.log(15, 'valid_params=%s', valid_params)
+            self.log.log(15, 'valid_params=%s', valid_params)
 
             url = self._format_url(api_map['path'], kwargs)
 
@@ -142,7 +138,7 @@ class Asgard(object):  # pylint: disable=R0903
             body.update(api_map.get('default_params', {}))
             body.update(kwargs.pop('data', None) or self.data)
             body.update(kwargs)
-            log.log(15, 'body=%s', body)
+            self.log.log(15, 'body=%s', body)
 
             if method == 'GET':
                 action = 'params'
@@ -157,25 +153,25 @@ class Asgard(object):  # pylint: disable=R0903
             }
 
             if self.username and self.password:
-                auth = {'auth': (self.username, decrypt_hash(self.password))}
+                auth = {'auth': (self.username, self.decrypt_hash(self.password))}
                 url_params.update(auth)
 
             # Make an http request (data replacements are finalized)
-            log.log(
+            self.log.log(
                 15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
                 method.lower(), pformat({
                     key: value
                     for key, value in url_params.items() if key != 'auth'
                 }))
             response = getattr(requests, method.lower())(**url_params)
-            log.debug(pformat(inspect.getmembers(response)))
+            self.log.debug(pformat(inspect.getmembers(response)))
 
             return self._response_handler(response, status)
 
         ##################
         # Starting point #
         ##################
-        log.debug('getattr locals():\n%s', pformat(locals()))
+        self.log.debug('getattr locals():\n%s', pformat(locals()))
 
         # Missing method is also not defined in our mapping table
         if api_call not in self.mapping_table:
@@ -189,50 +185,47 @@ class Asgard(object):  # pylint: disable=R0903
 
         Substitute mustache '{{}}' placeholders with data from keywords.
         """
-        log = logging.getLogger(__name__)
-        log.debug('URL formatter locals:\n%s', pformat(locals()))
+        self.log.debug('URL formatter locals:\n%s', pformat(locals()))
 
         # get keys parsed
         path_keys = [param[2] for param in Template.pattern.findall(path)]
-        log.debug('Template find=%s', Template.pattern.findall(path))
-        log.debug('path_keys=%s', path_keys)
+        self.log.debug('Template find=%s', Template.pattern.findall(path))
+        self.log.debug('path_keys=%s', path_keys)
 
         # Substitute mustache '{}' placeholders with data from keywords
         substitute_path = Template(path).substitute(kwargs)
-        log.debug('substitute_path=%s', substitute_path)
+        self.log.debug('substitute_path=%s', substitute_path)
 
-        log.debug('kwargs before pop=%s', pformat(kwargs))
+        self.log.debug('kwargs before pop=%s', pformat(kwargs))
 
         # remove ${} parameter from url, so its not added to querystring
         for param in path_keys:
-            log.debug('Removing url param: %s', param)
+            self.log.debug('Removing url param: %s', param)
             kwargs.pop(param)
 
-        log.debug('kwargs after pop=%s', pformat(kwargs))
+        self.log.debug('kwargs after pop=%s', pformat(kwargs))
 
         url = '{}{}'.format(self.url, substitute_path)
-        log.log(15, 'url=%s', url)
+        self.log.log(15, 'url=%s', url)
 
         return url
 
-    @staticmethod
-    def _response_handler(response, status):
+    def _response_handler(self, response, status):
         """
         Handle response as callback
 
         If the response status is different from status defined in the
         mapping table, then we assume an error and raise proper exception
         """
-        log = logging.getLogger(__name__)
 
-        log.debug('Expected response status: %s', status)
-        log.debug('Request response:\n%s',
+        self.log.debug('Expected response status: %s', status)
+        self.log.debug('Request response:\n%s',
                   pformat(inspect.getmembers(response)))
 
         # Just in case
         if response is None:
             message = 'Response Not Found'
-            log.error(message)
+            self.log.error(message)
             raise AsgardError(message)
 
         if response.status_code == 401:
@@ -240,15 +233,15 @@ class Asgard(object):  # pylint: disable=R0903
 
         if response.status_code != status:
             error = AsgardError(response.reason, response.status_code)
-            log.fatal(error)
+            self.log.fatal(error)
             raise error
 
         # Deserialize json content if content exist. In some cases Asgard
         # returns ' ' strings. Also return false non strings (0, [], (), {})
         try:
             response_json = response.json()
-            log.debug('Response JSON:\n%s', pformat(response_json))
+            self.log.debug('Response JSON:\n%s', pformat(response_json))
             return response_json
         except ValueError:
-            log.debug('Response HTML:\n%s', response.text)
+            self.log.debug('Response HTML:\n%s', response.text)
             return response.text
