@@ -71,7 +71,7 @@ def test_asgard_error():
 def test_builtin_errors():
     """Check that builtin errors trigger with bad formats."""
     with pytest.raises(TypeError):
-        asgard = Asgard(URL, username=USERNAME, password='bad_password')
+        asgard = Asgard(URL, username=USERNAME, password=ENC_PASSWD, data={'bad': 'param'})
         asgard.show_instance(instance_id='i21bcfec8')
 
     with pytest.raises(AttributeError):
