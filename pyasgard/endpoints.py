@@ -60,6 +60,11 @@ MAPPING_TABLE = {
         'method': 'GET',
         'status': 200,
     },
+    'list_clusters': {
+        'path': '/cluster/list.json',
+        'method': 'GET',
+        'status': 200,
+    },
     'cluster_resize': {
         'path': '/cluster/resize',
         'method': 'POST',
