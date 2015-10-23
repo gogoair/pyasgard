@@ -17,12 +17,11 @@ class AsgardError(Exception):
     """Error from request to Asgard API."""
 
     def __init__(self, msg, error_code=None):
-        super(AsgardError, self).__init__()
-        self.msg = msg
+        super(AsgardError, self).__init__(msg)
         self.error_code = error_code
 
     def __str__(self):
-        return repr('%s: %s' % (self.error_code, self.msg))
+        return repr('%s: %s' % (self.error_code, self.message))
 
 
 class AsgardAuthenticationError(AsgardError):
@@ -30,10 +29,9 @@ class AsgardAuthenticationError(AsgardError):
 
     def __init__(self, msg):
         super(AsgardAuthenticationError, self).__init__(msg)
-        self.msg = msg
 
     def __str__(self):
-        return repr(self.msg)
+        return repr(self.message)
 
 
 class Asgard(object):  # pylint: disable=R0903
@@ -289,7 +287,7 @@ class Asgard(object):  # pylint: disable=R0903
             raise AsgardAuthenticationError(response.reason)
 
         if response.status_code != status:
-            error = AsgardError(response.reason, response.status_code)
+            error = AsgardError(response.json(), response.status_code)
             self.log.fatal(error)
             raise error
 
