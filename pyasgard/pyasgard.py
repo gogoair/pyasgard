@@ -160,8 +160,7 @@ class Asgard(object):  # pylint: disable=R0903
             # params url encoded to url variable.
             for keyword in kwargs:
                 if keyword not in valid_params and keyword not in api_map[
-                        'default_params'
-                ]:
+                        'default_params']:
                     raise TypeError("%s() got an unexpected keyword argument "
                                     "'%s'" % (api_call, keyword))
 
@@ -191,11 +190,11 @@ class Asgard(object):  # pylint: disable=R0903
                 url_params.update(auth)
 
             # Make an http request (data replacements are finalized)
-            self.log.log(
-                15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
-                method.lower(),
-                pformat(dict((key, value) for key, value in url_params.items()
-                             if key != 'auth')))
+            self.log.log(15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
+                         method.lower(),
+                         pformat(dict((key, value)
+                                      for key, value in url_params.items()
+                                      if key != 'auth')))
             response = getattr(requests, method.lower())(**url_params)
             self.log.debug(pformat(inspect.getmembers(response)))
 

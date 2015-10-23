@@ -11,7 +11,6 @@ import logging
 from pprint import pformat
 
 import pytest
-
 from pyasgard.endpoints import MAPPING_TABLE
 from pyasgard.pyasgard import Asgard, AsgardAuthenticationError, AsgardError
 
@@ -46,15 +45,15 @@ def test_url_formatter():
     assert test_url == 'http://test.com/test_region/region/list.json'
 
     test_url = test_asgard._format_url(  # pylint: disable=W0212
-        MAPPING_TABLE['list_application_instances']['path'],
-        {'app_id': 'THIS'})
+        MAPPING_TABLE['list_application_instances']['path'], {'app_id': 'THIS'
+                                                              })
 
     assert test_url == 'http://test.com/test_region/instance/list/THIS.json'
 
     with pytest.raises(KeyError):
         test_url = test_asgard._format_url(  # pylint: disable=W0212
-            MAPPING_TABLE['list_application_instances']['path'],
-            {'something': 'ELSE'})
+            MAPPING_TABLE['list_application_instances']['path'], {'something':
+                                                                  'ELSE'})
 
 
 def test_authentication_errors():
@@ -78,7 +77,10 @@ def test_asgard_error():
 def test_builtin_errors():
     """Check that builtin errors trigger with bad formats."""
     with pytest.raises(TypeError):
-        asgard = Asgard(URL, username=USERNAME, password=ENC_PASSWD, data={'bad': 'param'})
+        asgard = Asgard(URL,
+                        username=USERNAME,
+                        password=ENC_PASSWD,
+                        data={'bad': 'param'})
         asgard.show_instance(instance_id='i21bcfec8')
 
     with pytest.raises(AttributeError):
