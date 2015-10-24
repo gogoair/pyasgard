@@ -145,6 +145,29 @@ def test_mappings():
         assert 'status' in values
 
 
+def test_json_return():
+    """With a good list call, we should get a list of dicts.
+
+    When doing list operations, Asgard returns a JSON response with a list of
+    dict objects for iterating over.
+    """
+    returned = ASGARD.list_regions()
+    logging.debug(returned)
+
+    assert isinstance(returned, list)
+    for item in returned:
+        assert isinstance(item, dict)
+
+    # Check another list, just in case
+    returned = ASGARD.list_clusters()
+    logging.debug(returned)
+
+    assert isinstance(returned, list)
+
+    for item in returned:
+        assert isinstance(item, dict)
+
+
 def test_html_return():
     """Send bad data, make sure that returned HTML comes back as a dict."""
     returned = ASGARD.create_application(name='ntangsurat', email='')
