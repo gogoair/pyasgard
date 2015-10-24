@@ -14,7 +14,14 @@ Usage:
 """
 from bs4 import BeautifulSoup
 
-from HTMLParser import HTMLParser
+try:
+    # python2
+    from HTMLParser import HTMLParser
+    string_types = (str, unicode)
+except ImportError:
+    # python3
+    from html.parser import HTMLParser
+    string_types = (str)
 
 
 class HTMLToDict(HTMLParser):
@@ -86,10 +93,10 @@ class HTMLToDict(HTMLParser):
 
     def clean(self, values):
         """Strip whitespace from data."""
-        for key in values.keys():
+        for key in list(values.keys()):
             value = values[key]
 
-            if isinstance(value, (str, unicode)):
+            if isinstance(value, string_types):
                 stripped = value.strip(" \n\r\t")
 
                 if stripped == '':
