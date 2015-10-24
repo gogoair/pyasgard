@@ -175,6 +175,15 @@ def test_html_return():
     assert isinstance(returned, dict)
 
 
+def test_bad_argument():
+    """We should raise TypeError when a bad argument is seen."""
+    with pytest.raises(TypeError):
+        ASGARD.list_clusters(something='bad')
+
+    with pytest.raises(TypeError):
+        ASGARD.create_application(something='bad')
+
+
 if __name__ == '__main__':
     logging.basicConfig(
         level=logging.DEBUG,

@@ -160,10 +160,13 @@ class Asgard(object):  # pylint: disable=R0903
             # Validate remaining kwargs against valid_params and add
             # params url encoded to url variable.
             for keyword in kwargs:
-                if keyword not in valid_params and keyword not in api_map[
-                        'default_params']:
-                    raise TypeError("%s() got an unexpected keyword argument "
-                                    "'%s'" % (api_call, keyword))
+                if keyword not in valid_params:
+                    if 'default_params' not in api_map:
+                        raise TypeError('Was not expecting any arguments.')
+                    elif keyword not in api_map['default_params']:
+                        raise TypeError(('{0}() got an unexpected keyword '
+                                         'argument "{1}"').format(api_call,
+                                                                  keyword))
 
             # Body can be passed from data or in args
             body = {}
