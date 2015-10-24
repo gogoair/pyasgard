@@ -185,9 +185,16 @@ def test_bad_argument():
 
 
 if __name__ == '__main__':
+    """This is not the best way to run.
+
+    Coverage report shows missing lines when in fact they are actually covered.
+    This seems to be a known issue with py.test and something about import
+    order. For now, run full command `py.test -v --cov pyasgard --cov-report
+    term-missing --cov-report html test_pyasgard.py` or `tox`.
+    """
     logging.basicConfig(
         level=logging.DEBUG,
         format='[%(levelname)s]%(module)s:%(funcName)s - %(message)s')
-    TEST_ARGS = ['-v', '--cov=pyasgard', '--cov-report', 'term-missing',
+    TEST_ARGS = ['-v', '--cov', 'pyasgard', '--cov-report', 'term-missing',
                  '--cov-report', 'html', __file__]
     pytest.main(TEST_ARGS)
