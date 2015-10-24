@@ -145,8 +145,17 @@ def test_mappings():
         assert 'status' in values
 
 
+def test_html_return():
+    """Send bad data, make sure that returned HTML comes back as a dict."""
+    returned = ASGARD.create_application(name='ntangsurat', email='')
+    logging.debug(returned)
+    assert isinstance(returned, dict)
+
+
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='[%(levelname)s]%(module)s:%(funcName)s - %(message)s')
     TEST_ARGS = ['-v', '--cov=pyasgard', '--cov-report', 'term-missing',
                  '--cov-report', 'html', __file__]
     pytest.main(TEST_ARGS)

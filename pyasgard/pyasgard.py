@@ -11,6 +11,7 @@ from string import Template
 import requests
 
 from .endpoints import MAPPING_TABLE
+from .htmltodict import HTMLToDict
 
 
 class AsgardError(Exception):
@@ -298,4 +299,4 @@ class Asgard(object):  # pylint: disable=R0903
             return response_json
         except ValueError:
             self.log.debug('Response HTML:\n%s', response.text)
-            return response.text
+            return HTMLToDict().dict(response.text)
