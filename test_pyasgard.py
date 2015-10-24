@@ -184,6 +184,16 @@ def test_bad_argument():
         ASGARD.create_application(something='bad')
 
 
+def test_errors():
+    """Make sure custom errors have the right attributes."""
+    asgarderror = AsgardError('message', 404)
+    assert str(asgarderror) == repr('404: message')
+    assert asgarderror.error_code == 404
+
+    asgarderror = AsgardAuthenticationError('message')
+    assert str(asgarderror) == repr('message')
+
+
 if __name__ == '__main__':
     """This is not the best way to run.
 
