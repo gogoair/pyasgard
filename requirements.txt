@@ -2,3 +2,4 @@ beautifulsoup4
 pytest
 pytest-cov
 requests
+tox
