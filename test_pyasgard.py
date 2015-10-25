@@ -45,8 +45,8 @@ def test_url_formatter():
     assert test_url == 'http://test.com/test_region/region/list.json'
 
     test_url = test_asgard._format_url(  # pylint: disable=W0212
-        MAPPING_TABLE['list_application_instances']['path'], {'app_id': 'THIS'
-                                                              })
+        MAPPING_TABLE['list_application_instances']['path'], {'app_id':
+                                                              'THIS'})
 
     assert test_url == 'http://test.com/test_region/instance/list/THIS.json'
 
@@ -191,7 +191,8 @@ def test_errors():
     assert asgarderror.error_code == 404
 
     asgarderror = AsgardAuthenticationError('message')
-    assert str(asgarderror) == repr('message')
+    assert str(asgarderror) == repr('401: message')
+    assert asgarderror.error_code == 401
 
 
 if __name__ == '__main__':
