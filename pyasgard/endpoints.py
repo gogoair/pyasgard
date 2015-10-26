@@ -1,4 +1,5 @@
 """Asgard API mapping."""
+INSTANCE_TYPE = 't2.micro'
 
 MAPPING_TABLE = {
     'list_regions': {
@@ -79,6 +80,29 @@ MAPPING_TABLE = {
         'path': '/image/show/${ami_id}.json',
         'method': 'GET',
         'status': 200,
+    },
+    'list_ami': {
+        'path': '/image/list.json',
+        'method': 'GET',
+        'status': 200,
+    },
+    'push_ami': {
+        'path': '/push/startRolling',
+        'method': 'POST',
+        'status': 200,
+        'default_params': {'name': '',
+                           'appName': '',
+                           'imageId': '',
+                           'instanceType': INSTANCE_TYPE,
+                           'keyName': 'jenkins_access',
+                           'selectedSecurityGroups': ['default'],
+                           'relaunchCount': 1,
+                           'kernelId': '',
+                           'ramdiskId': '',
+                           'concurrentRelaunches': 1,
+                           'newestFirst': 'false',
+                           'checkHealth': 'on',
+                           'afterBootWait': 30, },
     },
     'list_launchconfigs': {
         'path': '/launchConfiguration/list.json',
