@@ -7,6 +7,42 @@ MAPPING_TABLE = {
         'method': 'GET',
         'status': 200,
     },
+    'list_security_groups': {
+        'path': '/security/list.json',
+        'method': 'GET',
+        'status': 200,
+    },
+    'show_security_group': {
+        'path': '/security/show.json',
+        'method': 'GET',
+        'status': 200,
+        'default_params': {
+            'id': '',
+        },
+    },
+    'create_security_group': {
+        'path': '/security/create',
+        'method': 'POST',
+        'status': 200,
+        'default_params': {
+            'appName': '',
+            'detail': '',
+            'enableVpc': 'on',
+            'vpcId': '',
+            '_enableVpc': '',
+            'description': '',
+            '_action_save': '',
+        },
+    },
+    'delete_security_group': {
+        'path': '/security/index',
+        'method': 'POST',
+        'status': 200,
+        'default_params': {
+            'id': '',
+            '_action_delete': '',
+        },
+    },
     'list_instances': {
         'path': '/instance/list.json',
         'method': 'GET',
