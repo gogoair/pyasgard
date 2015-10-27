@@ -7,6 +7,11 @@ MAPPING_TABLE = {
         'method': 'GET',
         'status': 200,
     },
+    'list_subnets': {
+        'path': '/subnet/list.json',
+        'method': 'GET',
+        'status': 200,
+    },
     'list_security_groups': {
         'path': '/security/list.json',
         'method': 'GET',
