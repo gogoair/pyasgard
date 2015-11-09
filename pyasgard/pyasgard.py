@@ -66,12 +66,16 @@ class AsgardCommand(object):  # pylint: disable=R0903
         self.log = logging.getLogger(__name__)
         self.log.debug('getattr locals():\n%s', pformat(locals()))
 
-        # Missing method is also not defined in our mapping table
-        if api_call not in client.mapping_table:
-            raise AttributeError('Method "%s" Does Not Exist' % api_call)
-
         self.client = client
         self.api_call = api_call
+
+        # Missing method is also not defined in our mapping table
+        try:
+            self.api_map = self.client.mapping_table[self.api_call]
+            self.log.debug('api_map:\n%s', pformat(self.api_map))
+        except KeyError:
+            raise AttributeError('Method "{0}" does not exist.'.format(
+                self.api_call))
 
     def __call__(self, **kwargs):
         """Request call to Asgard API.
@@ -95,21 +99,9 @@ class AsgardCommand(object):  # pylint: disable=R0903
 
         method = api_map['method']
         status = api_map['status']
-        valid_params = api_map.get('valid_params', ())
-        self.log.log(15, 'valid_params=%s', valid_params)
-
         url = self.client.format_url(api_map['path'], kwargs)
 
-        # Validate remaining kwargs against valid_params and add
-        # params url encoded to url variable.
-        for keyword in kwargs:
-            if keyword not in valid_params:
-                if 'default_params' not in api_map:
-                    raise TypeError('Was not expecting any arguments.')
-                elif keyword not in api_map['default_params']:
-                    raise TypeError(('{0}() got an unexpected keyword '
-                                     'argument "{1}"').format(self.api_call,
-                                                              keyword))
+        self.validate_params(kwargs)
 
         # Body can be passed from data or in args
         body = {}
@@ -144,6 +136,20 @@ class AsgardCommand(object):  # pylint: disable=R0903
         self.log.debug(pformat(inspect.getmembers(response)))
 
         return self.client.response_handler(response, status)
+
+    def validate_params(self, kwargs):
+        """Validate remaining kwargs against valid_params."""
+        valid_params = self.api_map.get('valid_params', ())
+        self.log.log(15, 'valid_params=%s', valid_params)
+
+        for keyword in kwargs:
+            if keyword not in valid_params:
+                if 'default_params' not in self.api_map:
+                    raise TypeError('Was not expecting any arguments.')
+                elif keyword not in self.api_map['default_params']:
+                    raise TypeError(('{0}() got an unexpected keyword '
+                                     'argument "{1}"').format(self.api_call,
+                                                              keyword))
 
 
 class Asgard(object):
