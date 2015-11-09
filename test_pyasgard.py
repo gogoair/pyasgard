@@ -38,20 +38,20 @@ def test_url_formatter():
     """Check the URL formatter when combining the base URL with endpoint."""
     test_asgard = Asgard('http://test.com', ec2_region='test_region')
 
-    test_url = test_asgard._format_url(  # pylint: disable=W0212
+    test_url = test_asgard.format_url(  # pylint: disable=W0212
         '/region/list.json', {'test': 'this'})
     logging.debug(test_url)
 
     assert test_url == 'http://test.com/test_region/region/list.json'
 
-    test_url = test_asgard._format_url(  # pylint: disable=W0212
+    test_url = test_asgard.format_url(  # pylint: disable=W0212
         MAPPING_TABLE['list_application_instances']['path'], {'app_id':
                                                               'THIS'})
 
     assert test_url == 'http://test.com/test_region/instance/list/THIS.json'
 
     with pytest.raises(KeyError):
-        test_url = test_asgard._format_url(  # pylint: disable=W0212
+        test_url = test_asgard.format_url(  # pylint: disable=W0212
             MAPPING_TABLE['list_application_instances']['path'], {'something':
                                                                   'ELSE'})
 
