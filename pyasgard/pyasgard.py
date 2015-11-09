@@ -36,7 +36,117 @@ class AsgardAuthenticationError(AsgardError):
         return super(AsgardAuthenticationError, self).__str__()
 
 
-class Asgard(object):  # pylint: disable=R0903
+class AsgardCommand(object):  # pylint: disable=R0903
+    """Dynamic construction of attributes based on endpoint mapping table.
+
+    Instead of writing out each API endpoint as a method here or binding
+    the API endpoints at instance runttime, we can simply use an elegant
+    Python technique to construct method execution on- demand. We simply
+    provide a mapping table between Asgard API calls and function names
+    (with necessary parameters to replace embedded keywords on GET or json
+    data on POST/PUT requests).
+
+    __getattr__() is used as callback method implemented so that when an
+    object tries to call a method which is not defined here, it looks to
+    find a relationship in the the mapping table.  The table provides the
+    structure of the API call and parameters passed in the method will
+    populate missing data.
+
+    Raises:
+        AttributeError: Attribute is not part of the mapping table.
+
+    Returns:
+        Dict representation of HTML or JSON returned from Asgard API.
+
+    TODO:
+        Should probably url-encode GET query parameters on replacement
+    """
+
+    def __init__(self, client, api_call):
+        self.log = logging.getLogger(__name__)
+        self.log.debug('getattr locals():\n%s', pformat(locals()))
+
+        # Missing method is also not defined in our mapping table
+        if api_call not in client.mapping_table:
+            raise AttributeError('Method "%s" Does Not Exist' % api_call)
+
+        self.client = client
+        self.api_call = api_call
+
+    def __call__(self, **kwargs):
+        """Request call to Asgard API.
+
+        This constructs the outgoing request to your Asgard Server.
+
+        Args:
+            **kwargs: Only excepts keywords used in the endpoint mapping
+                _path_, _valid_params_, and _default_params_.
+
+        Returns:
+            A dict of the HTML or JSON from Asgard.
+
+        Raises:
+            TypeError: If an unexpected keyword was passed in.
+        """
+        self.log.debug('call locals():\n%s', pformat(locals()))
+
+        api_map = self.client.mapping_table[self.api_call]
+        self.log.debug('api_map:\n%s', pformat(api_map))
+
+        method = api_map['method']
+        status = api_map['status']
+        valid_params = api_map.get('valid_params', ())
+        self.log.log(15, 'valid_params=%s', valid_params)
+
+        url = self.client.format_url(api_map['path'], kwargs)
+
+        # Validate remaining kwargs against valid_params and add
+        # params url encoded to url variable.
+        for keyword in kwargs:
+            if keyword not in valid_params:
+                if 'default_params' not in api_map:
+                    raise TypeError('Was not expecting any arguments.')
+                elif keyword not in api_map['default_params']:
+                    raise TypeError(('{0}() got an unexpected keyword '
+                                     'argument "{1}"').format(self.api_call,
+                                                              keyword))
+
+        # Body can be passed from data or in args
+        body = {}
+        body.update(api_map.get('default_params', {}))
+        body.update(kwargs.pop('data', None) or self.client.data)
+        body.update(kwargs)
+        self.log.log(15, 'body=%s', body)
+
+        if method == 'GET':
+            action = 'params'
+        else:
+            action = 'data'
+
+        url_params = {
+            'url': url,
+            action: body,
+            'headers': self.client.headers,
+            'timeout': 15,
+        }
+
+        if self.client.username and self.client.password:
+            auth = {'auth': (self.client.username,
+                             self.client.decrypt_hash(self.client.password))}
+            url_params.update(auth)
+
+        # Make an http request (data replacements are finalized)
+        self.log.log(15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
+                     method.lower(), pformat(dict((
+                         key, value
+                     ) for key, value in url_params.items() if key != 'auth')))
+        response = getattr(requests, method.lower())(**url_params)
+        self.log.debug(pformat(inspect.getmembers(response)))
+
+        return self.client.response_handler(response, status)
+
+
+class Asgard(object):
     """Python API Wrapper for Asgard."""
 
     def __init__(self,  # pylint: disable=R0913
@@ -106,118 +216,10 @@ class Asgard(object):  # pylint: disable=R0903
         return self_keys + map_keys
 
     def __getattr__(self, api_call):
-        """Dynamic construction of attributes based on endpoint mapping table.
-
-        Instead of writing out each API endpoint as a method here or binding
-        the API endpoints at instance runttime, we can simply use an elegant
-        Python technique to construct method execution on- demand. We simply
-        provide a mapping table between Asgard API calls and function names
-        (with necessary parameters to replace embedded keywords on GET or json
-        data on POST/PUT requests).
-
-        __getattr__() is used as callback method implemented so that when an
-        object tries to call a method which is not defined here, it looks to
-        find a relationship in the the mapping table.  The table provides the
-        structure of the API call and parameters passed in the method will
-        populate missing data.
-
-        Raises:
-            AttributeError: Attribute is not part of the mapping table.
-
-        Returns:
-            Dict representation of HTML or JSON returned from Asgard API.
-
-        TODO:
-            Should probably url-encode GET query parameters on replacement
-        """
-
-        def call(self, **kwargs):
-            """Request call to Asgard API.
-
-            This constructs the outgoing request to your Asgard Server.
-
-            Args:
-                **kwargs: Only excepts keywords used in the endpoint mapping
-                    _path_, _valid_params_, and _default_params_.
-
-            Returns:
-                A dict of the HTML or JSON from Asgard.
-
-            Raises:
-                TypeError: If an unexpected keyword was passed in.
-            """
-            self.log.debug('call locals():\n%s', pformat(locals()))
-
-            api_map = self.mapping_table[api_call]
-            self.log.debug('api_map:\n%s', pformat(api_map))
-
-            method = api_map['method']
-            status = api_map['status']
-            valid_params = api_map.get('valid_params', ())
-            self.log.log(15, 'valid_params=%s', valid_params)
-
-            url = self._format_url(api_map['path'], kwargs)
-
-            # Validate remaining kwargs against valid_params and add
-            # params url encoded to url variable.
-            for keyword in kwargs:
-                if keyword not in valid_params:
-                    if 'default_params' not in api_map:
-                        raise TypeError('Was not expecting any arguments.')
-                    elif keyword not in api_map['default_params']:
-                        raise TypeError(('{0}() got an unexpected keyword '
-                                         'argument "{1}"').format(api_call,
-                                                                  keyword))
-
-            # Body can be passed from data or in args
-            body = {}
-            body.update(api_map.get('default_params', {}))
-            body.update(kwargs.pop('data', None) or self.data)
-            body.update(kwargs)
-            self.log.log(15, 'body=%s', body)
-
-            if method == 'GET':
-                action = 'params'
-            else:
-                action = 'data'
-
-            url_params = {
-                'url': url,
-                action: body,
-                'headers': self.headers,
-                'timeout': 15,
-            }
-
-            if self.username and self.password:
-                auth = {
-                    'auth': (self.username, self.decrypt_hash(self.password))
-                }
-                url_params.update(auth)
-
-            # Make an http request (data replacements are finalized)
-            self.log.log(15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
-                         method.lower(),
-                         pformat(dict((key, value)
-                                      for key, value in url_params.items()
-                                      if key != 'auth')))
-            response = getattr(requests, method.lower())(**url_params)
-            self.log.debug(pformat(inspect.getmembers(response)))
-
-            return self._response_handler(response, status)
-
-        ##################
-        # Starting point #
-        ##################
-        self.log.debug('getattr locals():\n%s', pformat(locals()))
-
-        # Missing method is also not defined in our mapping table
-        if api_call not in self.mapping_table:
-            raise AttributeError('Method "%s" Does Not Exist' % api_call)
-
         # Execute dynamic method and pass in keyword args as data to API call
-        return call.__get__(self)  # pylint: disable=E1101
+        return AsgardCommand(self, api_call)
 
-    def _format_url(self, path, kwargs):
+    def format_url(self, path, kwargs):
         """Format request URL with endpoint mapping.
 
         Substitute `${}` placeholders with data from keywords. This removes the
@@ -256,7 +258,7 @@ class Asgard(object):  # pylint: disable=R0903
 
         return url
 
-    def _response_handler(self, response, status):
+    def response_handler(self, response, status):
         """
         Handle response as callback
 
