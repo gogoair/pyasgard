@@ -115,10 +115,8 @@ class AsgardCommand(object):  # pylint: disable=R0903
             'timeout': 15,
         }
 
-        if self.client.username and self.client.password:
-            auth = {'auth': (self.client.username,
-                             self.client.decrypt_hash(self.client.password))}
-            url_params.update(auth)
+        auth = self.client.get_auth()
+        url_params.update(auth)
 
         # Make an http request (data replacements are finalized)
         self.log.log(15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
@@ -209,6 +207,15 @@ class Asgard(object):
         self.api_version = api_version
         self.mapping_table = MAPPING_TABLE
 
+    def __dir__(self):
+        self_keys = [key for key in self.__dict__.keys()]
+        map_keys = [key for key in self.mapping_table.keys()]
+        return self_keys + map_keys
+
+    def __getattr__(self, api_call):
+        # Execute dynamic method and pass in keyword args as data to API call
+        return AsgardCommand(self, api_call)
+
     def decrypt_hash(self, password):
         """Decrypt the encrypted password string.
 
@@ -222,14 +229,18 @@ class Asgard(object):
         self.log.debug('Password decrypted.')
         return password.decode()
 
-    def __dir__(self):
-        self_keys = [key for key in self.__dict__.keys()]
-        map_keys = [key for key in self.mapping_table.keys()]
-        return self_keys + map_keys
+    def get_auth(self):
+        """Gets username and password for request authentication.
 
-    def __getattr__(self, api_call):
-        # Execute dynamic method and pass in keyword args as data to API call
-        return AsgardCommand(self, api_call)
+        Returns:
+            Empty dict if no authentication specified, otherwise return::
+
+                {'auth': (username, password)}
+        """
+        if self.username and self.password:
+            return {'auth': (self.username, self.decrypt_hash(self.password))}
+
+        return {}
 
     def format_url(self, path, kwargs):
         """Format request URL with endpoint mapping.
