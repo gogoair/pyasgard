@@ -118,7 +118,7 @@ class AsgardCommand(object):  # pylint: disable=R0903
         auth = self.client.get_auth()
         url_params.update(auth)
 
-        response = self.client.call_asgard(method, url_params)
+        response = self.client.asgard_request(method, url_params)
 
         return self.client.response_handler(response, status)
 
@@ -210,7 +210,7 @@ class Asgard(object):
         # Execute dynamic method and pass in keyword args as data to API call
         return AsgardCommand(self, api_call)
 
-    def decrypt_hash(self, password):
+    def decrypt_password(self, password):
         """Decrypt the encrypted password string.
 
         Args:
@@ -232,7 +232,8 @@ class Asgard(object):
                 {'auth': (username, password)}
         """
         if self.username and self.password:
-            return {'auth': (self.username, self.decrypt_hash(self.password))}
+            return {'auth':
+                    (self.username, self.decrypt_password(self.password))}
 
         return {}
 
@@ -275,7 +276,7 @@ class Asgard(object):
 
         return url
 
-    def call_asgard(self, method, url_params):
+    def asgard_request(self, method, url_params):
         """Make an http request (data replacements are finalized)."""
         self.log.log(15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
                      method.lower(), pformat(dict((
