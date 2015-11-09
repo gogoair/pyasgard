@@ -126,6 +126,12 @@ class AsgardCommand(object):  # pylint: disable=R0903
         """Form body of request.
 
         Body can be passed from data or in args.
+
+        Returns:
+            Dict for body of request, e.g.::
+
+                requests.get(url, params=body)
+                requests.post(url, data=body)
         """
         body = {}
         body.update(self.api_map.get('default_params', {}))
