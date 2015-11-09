@@ -202,8 +202,8 @@ class Asgard(object):
         self.mapping_table = MAPPING_TABLE
 
     def __dir__(self):
-        self_keys = [key for key in self.__dict__.keys()]
-        map_keys = [key for key in self.mapping_table.keys()]
+        self_keys = list(self.__dict__.keys())
+        map_keys = list(self.mapping_table.keys())
         return self_keys + map_keys
 
     def __getattr__(self, api_call):
