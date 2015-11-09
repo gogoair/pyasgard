@@ -118,13 +118,7 @@ class AsgardCommand(object):  # pylint: disable=R0903
         auth = self.client.get_auth()
         url_params.update(auth)
 
-        # Make an http request (data replacements are finalized)
-        self.log.log(15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
-                     method.lower(), pformat(dict((
-                         key, value
-                     ) for key, value in url_params.items() if key != 'auth')))
-        response = getattr(requests, method.lower())(**url_params)
-        self.log.debug(pformat(inspect.getmembers(response)))
+        response = self.client.call_asgard(method, url_params)
 
         return self.client.response_handler(response, status)
 
@@ -280,6 +274,17 @@ class Asgard(object):
         self.log.log(15, 'url=%s', url)
 
         return url
+
+    def call_asgard(self, method, url_params):
+        """Make an http request (data replacements are finalized)."""
+        self.log.log(15, 'getattr(%s, %s)(%s)\n[auth] redacted', requests,
+                     method.lower(), pformat(dict((
+                         key, value
+                     ) for key, value in url_params.items() if key != 'auth')))
+        response = getattr(requests, method.lower())(**url_params)
+        self.log.debug(pformat(inspect.getmembers(response)))
+
+        return response
 
     def response_handler(self, response, status):
         """
