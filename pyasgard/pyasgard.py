@@ -101,12 +101,7 @@ class AsgardCommand(object):  # pylint: disable=R0903
 
         self.validate_params(kwargs)
 
-        # Body can be passed from data or in args
-        body = {}
-        body.update(self.api_map.get('default_params', {}))
-        body.update(kwargs.pop('data', None) or self.client.data)
-        body.update(kwargs)
-        self.log.log(15, 'body=%s', body)
+        body = self.construct_body(kwargs)
 
         if method == 'GET':
             action = 'params'
@@ -134,6 +129,19 @@ class AsgardCommand(object):  # pylint: disable=R0903
         self.log.debug(pformat(inspect.getmembers(response)))
 
         return self.client.response_handler(response, status)
+
+    def construct_body(self, kwargs):
+        """Form body of request.
+
+        Body can be passed from data or in args.
+        """
+        body = {}
+        body.update(self.api_map.get('default_params', {}))
+        body.update(kwargs.pop('data', None) or self.client.data)
+        body.update(kwargs)
+        self.log.log(15, 'body=%s', body)
+
+        return body
 
     def validate_params(self, kwargs):
         """Validate remaining kwargs against valid_params."""
