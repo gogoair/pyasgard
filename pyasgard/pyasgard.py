@@ -94,18 +94,16 @@ class AsgardCommand(object):  # pylint: disable=R0903
         """
         self.log.debug('call locals():\n%s', pformat(locals()))
 
-        api_map = self.client.mapping_table[self.api_call]
-        self.log.debug('api_map:\n%s', pformat(api_map))
+        method = self.api_map['method']
+        status = self.api_map['status']
 
-        method = api_map['method']
-        status = api_map['status']
-        url = self.client.format_url(api_map['path'], kwargs)
+        url = self.client.format_url(self.api_map['path'], kwargs)
 
         self.validate_params(kwargs)
 
         # Body can be passed from data or in args
         body = {}
-        body.update(api_map.get('default_params', {}))
+        body.update(self.api_map.get('default_params', {}))
         body.update(kwargs.pop('data', None) or self.client.data)
         body.update(kwargs)
         self.log.log(15, 'body=%s', body)
