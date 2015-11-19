@@ -29,9 +29,9 @@ def test_dir():
     asgard = Asgard('sdkfj')
     logging.debug('dir:\n%s', pformat(dir(asgard)))
 
-    assert all(word in dir(asgard)
-               for word in ['api_version', 'data', 'headers', 'list_instances',
-                            'mapping_table', 'username', 'url'])
+    for word in ['api_version', 'asg', 'data', 'elb', 'headers', 'instance',
+                 'mapping_table', 'username', 'url']:
+        assert word in dir(asgard)
 
 
 def test_url_formatter():
@@ -45,33 +45,33 @@ def test_url_formatter():
     assert test_url == 'http://test.com/test_region/region/list.json'
 
     test_url = test_asgard.format_url(  # pylint: disable=W0212
-        MAPPING_TABLE['list_application_instances']['path'], {'app_id':
-                                                              'THIS'})
+        MAPPING_TABLE['application']['list']['instances']['path'], {'app_id':
+                                                                    'THIS'})
 
     assert test_url == 'http://test.com/test_region/instance/list/THIS.json'
 
     with pytest.raises(KeyError):
         test_url = test_asgard.format_url(  # pylint: disable=W0212
-            MAPPING_TABLE['list_application_instances']['path'], {'something':
-                                                                  'ELSE'})
+            MAPPING_TABLE['application']['list']['instances']['path'],
+            {'something': 'ELSE'})
 
 
 def test_authentication_errors():
     """Check if full call with authentication works."""
     with pytest.raises(AsgardAuthenticationError):
         asgard = Asgard(URL)
-        asgard.show_instance(instance_id='i21bcfec8')
+        asgard.instance.show(instance_id='i21bcfec8')
 
     with pytest.raises(AsgardAuthenticationError):
         asgard = Asgard(URL, username='not_user')
-        asgard.show_instance(instance_id='i21bcfec8')
+        asgard.instance.show(instance_id='i21bcfec8')
 
 
 def test_asgard_error():
     """Make sure AsgardError triggers appropriately."""
     with pytest.raises(AsgardError):
         asgard = Asgard(URL, username=USERNAME, password=ENC_PASSWD)
-        asgard.show_instance(instance_id='sjdlkjf')
+        asgard.instance.show(instance_id='sjdlkjf')
 
 
 def test_builtin_errors():
@@ -81,7 +81,7 @@ def test_builtin_errors():
                         username=USERNAME,
                         password=ENC_PASSWD,
                         data={'bad': 'param'})
-        asgard.show_instance(instance_id='i21bcfec8')
+        asgard.instance.show(instance_id='i21bcfec8')
 
     with pytest.raises(AttributeError):
         asgard = Asgard(URL, username=USERNAME, password=ENC_PASSWD)
@@ -91,7 +91,7 @@ def test_builtin_errors():
 def test_success():
     """Make sure that basic good call works."""
     asgard = Asgard(URL, username=USERNAME, password=ENC_PASSWD)
-    response = asgard.list_regions()
+    response = asgard.regions.list()
     assert 'us-east-1' in [region['code'] for region in response]
 
 
@@ -102,11 +102,11 @@ def test_applications():
     test_name = 'pyasgard_test'
     test_description = 'Testing this out.'
 
-    pre_response = ASGARD.list_applications()
+    pre_response = ASGARD.application.list()
 
-    ASGARD.create_application(name=test_name, description=test_description)
+    ASGARD.application.create(name=test_name, description=test_description)
 
-    post_response = ASGARD.list_applications()
+    post_response = ASGARD.application.list()
 
     new_application = []
     for app in post_response:
@@ -126,23 +126,25 @@ def test_applications():
     assert new_application['name'] == test_name
     assert new_application['description'] == test_description
 
-    check_app_exists = ASGARD.show_application(app_name=test_name)
+    check_app_exists = ASGARD.application.show(app_name=test_name)
     logging.debug('check_app:\n%s', pformat(check_app_exists))
     assert check_app_exists['app']['description'] == test_description
 
-    ASGARD.delete_application(name=test_name)
+    ASGARD.application.delete(name=test_name)
 
     with pytest.raises(AsgardError):
-        check_app_deleted = ASGARD.show_application(app_name=test_name)
+        check_app_deleted = ASGARD.application.show(app_name=test_name)
         logging.debug('check_app:\n%s', pformat(check_app_deleted))
 
 
 def test_mappings():
     """Check mapping table has at minimum _method_, _path_, and _status_"""
-    for values in MAPPING_TABLE.values():
-        assert 'method' in values
-        assert 'path' in values
-        assert 'status' in values
+    for resource in MAPPING_TABLE.keys():
+        logging.debug('Resource = %s', resource)
+        for methods in MAPPING_TABLE[resource].values():
+            assert 'method' in methods
+            assert 'path' in methods
+            assert 'status' in methods
 
 
 def test_json_return():
@@ -151,7 +153,7 @@ def test_json_return():
     When doing list operations, Asgard returns a JSON response with a list of
     dict objects for iterating over.
     """
-    returned = ASGARD.list_regions()
+    returned = ASGARD.regions.list()
     logging.debug(returned)
 
     assert isinstance(returned, list)
@@ -159,7 +161,7 @@ def test_json_return():
         assert isinstance(item, dict)
 
     # Check another list, just in case
-    returned = ASGARD.list_clusters()
+    returned = ASGARD.cluster.list()
     logging.debug(returned)
 
     assert isinstance(returned, list)
@@ -170,7 +172,7 @@ def test_json_return():
 
 def test_html_return():
     """Send bad data, make sure that returned HTML comes back as a dict."""
-    returned = ASGARD.create_application(name='ntangsurat', email='')
+    returned = ASGARD.application.create(name='ntangsurat', email='')
     logging.debug(returned)
     assert isinstance(returned, dict)
 
@@ -178,10 +180,10 @@ def test_html_return():
 def test_bad_argument():
     """We should raise TypeError when a bad argument is seen."""
     with pytest.raises(TypeError):
-        ASGARD.list_clusters(something='bad')
+        ASGARD.cluster.list(something='bad')
 
     with pytest.raises(TypeError):
-        ASGARD.create_application(something='bad')
+        ASGARD.application.create(something='bad')
 
 
 def test_errors():
