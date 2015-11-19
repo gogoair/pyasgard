@@ -341,10 +341,14 @@ class Asgard(object):
             raise AsgardAuthenticationError(response.reason)
 
         if response.status_code != status:
-            error = AsgardError(response.json(), response.status_code)
+            error = AsgardError(
+                self.format_json(response), response.status_code)
             self.log.fatal(error)
             raise error
 
+        return self.format_json(response)
+
+    def format_json(self, response):
         # Deserialize json content if content exist. In some cases Asgard
         # returns ' ' strings. Also return false non strings (0, [], (), {})
         try:
