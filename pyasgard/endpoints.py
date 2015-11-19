@@ -161,10 +161,10 @@ MAPPING_TABLE = {
                 '_action_deactivate': '',
             },
         },
-        'create': {
-            'method': 'POST',
-            'status': 200,
-        },
+        # 'create': {
+        #     'method': 'POST',
+        #     'status': 200,
+        # },
         'shrink': {
             'path': '/cluster/save',
             'method': 'POST',
@@ -265,14 +265,18 @@ MAPPING_TABLE = {
         },
     },
     'instance': {
+        # 'create': {
+        #     'method': 'POST',
+        #     'status': 200,
+        # },
         'list': {
             'path': '/instance/list.json',
             'method': 'GET',
             'status': 200,
         },
-        'create': {
-            'doc': 'ksjdflj',
-            'method': 'POST',
+        'show': {
+            'path': '/instance/show/${instance_id}.json',
+            'method': 'GET',
             'status': 200,
         },
     },
