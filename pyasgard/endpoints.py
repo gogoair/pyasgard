@@ -226,6 +226,11 @@ MAPPING_TABLE = {
             'method': 'GET',
             'status': 200,
         },
+        'show': {
+            'path': '/deployment/show/${deployment_id}.json',
+            'method': 'GET',
+            'status': 200,
+        },
     },
     'elb': {
         'list': {
