@@ -62,7 +62,9 @@ class AsgardCommand(object):  # pylint: disable=R0903
         Should probably url-encode GET query parameters on replacement
     """
 
-    def __init__(self, client, api_call):
+    def __init__(self, client, api_call, menu):
+        super(AsgardCommand, self).__init__()
+
         self.log = logging.getLogger(__name__)
         self.log.debug('getattr locals():\n%s', pformat(locals()))
 
@@ -71,11 +73,22 @@ class AsgardCommand(object):  # pylint: disable=R0903
 
         # Missing method is also not defined in our mapping table
         try:
-            self.api_map = self.client.mapping_table[self.api_call]
+            self.api_map = menu[self.api_call]
             self.log.debug('api_map:\n%s', pformat(self.api_map))
         except KeyError:
-            raise AttributeError('Method "{0}" does not exist.'.format(
-                self.api_call))
+            raise AttributeError(('Method "{0}" does not exist.\n'
+                                  'Options available are: {1}').format(
+                                      self.api_call, menu.keys()))
+
+    def __dir__(self):
+        """Dynamically generate attributes and methods based on endpoints."""
+        self_keys = list(self.__dict__.keys())
+        menu_keys = list(self.api_map.keys())
+        return self_keys + menu_keys
+
+    def __getattr__(self, command):
+        """Recursively generate objects for endpoints."""
+        return AsgardCommand(self.client, command, self.api_map)
 
     def __call__(self, **kwargs):
         """Request call to Asgard API.
@@ -214,7 +227,7 @@ class Asgard(object):
 
     def __getattr__(self, api_call):
         # Execute dynamic method and pass in keyword args as data to API call
-        return AsgardCommand(self, api_call)
+        return AsgardCommand(self, api_call, self.mapping_table)
 
     def decrypt_password(self, password):
         """Decrypt the encrypted password string.
