@@ -194,7 +194,8 @@ MAPPING_TABLE = {
                 'subnetPurpose': 'app',
                 'selectedZones': ['us-east-1b'],
                 'azRebalance': 'enabled',
-                'selectedLoadBalancersForVpcId${vpc_id}': [''],
+                # We need to figure out a way to do this, or just pass the key
+                # 'selectedLoadBalancersForVpcId${vpc_id}': [''],
                 'imageId': '',
                 'instanceType': INSTANCE_TYPE,
                 'keyName': 'jenkins_access',
