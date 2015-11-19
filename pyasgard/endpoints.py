@@ -220,6 +220,13 @@ MAPPING_TABLE = {
             'status': 200,
         },
     },
+    'deployment': {
+        'prepare': {
+            'path': '/deployment/prepare/${cluster_id}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
     'elb': {
         'list': {
             'path': '/loadBalancer/list.json',
