@@ -231,6 +231,11 @@ MAPPING_TABLE = {
             'method': 'GET',
             'status': 200,
         },
+        'start': {
+            'path': '/deployment/start',
+            'method': 'POST',
+            'status': 200,
+        },
     },
     'elb': {
         'list': {
