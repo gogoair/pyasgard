@@ -221,6 +221,11 @@ MAPPING_TABLE = {
         },
     },
     'deployment': {
+        'list': {
+            'path': '/deployment/list.json',
+            'method': 'GET',
+            'status': 200,
+	},
         'prepare': {
             'path': '/deployment/prepare/${cluster_id}.json',
             'method': 'GET',
@@ -231,6 +236,11 @@ MAPPING_TABLE = {
             'method': 'GET',
             'status': 200,
         },
+	'detail' {
+	    'path': '/ng#/deployment/detail/${deployment_id}.json',
+	    'method': 'GET',
+	    'status': 200,
+	},
         'start': {
             'path': '/deployment/start',
             'method': 'POST',
