@@ -4,6 +4,7 @@ __version__ = "1.0"
 
 import base64
 import inspect
+import json
 import logging
 from pprint import pformat
 from string import Template
@@ -146,6 +147,10 @@ class AsgardCommand(object):  # pylint: disable=R0903
                 requests.get(url, params=body)
                 requests.post(url, data=body)
         """
+        # Provide a JSON object override
+        if 'json' in kwargs:
+            return json.dumps(kwargs['json'])
+
         body = {}
         body.update(self.api_map.get('default_params', {}))
         body.update(kwargs.pop('data', None) or self.client.data)

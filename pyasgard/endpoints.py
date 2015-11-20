@@ -235,7 +235,7 @@ MAPPING_TABLE = {
             'path': '/deployment/start',
             'method': 'POST',
             'status': 200,
-            'valid_params': ['data'],
+            'valid_params': ['json'],
         },
     },
     'elb': {
