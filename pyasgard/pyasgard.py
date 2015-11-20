@@ -342,13 +342,14 @@ class Asgard(object):
 
         if response.status_code != status:
             error = AsgardError(
-                self.format_json(response), response.status_code)
+                self.format_dict(response), response.status_code)
             self.log.fatal(error)
             raise error
 
-        return self.format_json(response)
+        return self.format_dict(response)
 
-    def format_json(self, response):
+    def format_dict(self, response):
+        """Format the response into a dict from HTML or JSON."""
         # Deserialize json content if content exist. In some cases Asgard
         # returns ' ' strings. Also return false non strings (0, [], (), {})
         try:
