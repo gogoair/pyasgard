@@ -21,15 +21,11 @@ asgard.cluster_resize(name='appname', minAndMaxSize=4)
 ```
 
 ## Testing
-To run the unit tests, create a `config.py` file and run:
+To run the unit tests, create a `config.py` file and run `tox`:
 
 ```python
 # Unit test contants
 ENC_PASSWD = 'dGVzdHBhc3N3ZA=='
 URL = 'http://asgard.demo.com'
 USERNAME = 'happydog'
-```
-
-```bash
-./test_pyasgard.py
 ```
