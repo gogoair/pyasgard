@@ -367,7 +367,15 @@ class Asgard(object):
         try:
             response_json = response.json()
             self.log.debug('Response JSON:\n%s', pformat(response_json))
+
+            with open('output.json', 'wb') as output_json:
+                output_json.write(response.text)
+
             return response_json
         except ValueError:
             self.log.debug('Response HTML:\n%s', response.text)
+
+            with open('output.html', 'wb') as output_html:
+                output_html.write(response.text)
+
             return HTMLToDict().dict(response.text)
