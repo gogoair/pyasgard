@@ -332,8 +332,8 @@ class Asgard(object):
             AsgardError: Response is missing or status code is not expected.
             AsgardAuthenticationError: Asgard reported bad authentication.
         """
-
         self.log.debug('Expected response status: %s', status)
+        self.log.debug('Received response status: %s', response.status_code)
 
         # Just in case
         if response is None:
