@@ -134,7 +134,10 @@ class AsgardCommand(object):  # pylint: disable=R0903
 
         response = self.client.asgard_request(method, url_params)
 
-        return self.client.response_handler(response, status)
+        try:
+            return self.client.response_handler(response, status)
+        except AsgardError:
+            raise
 
     def construct_body(self, kwargs):
         """Form body of request.
