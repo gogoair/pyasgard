@@ -339,6 +339,10 @@ class Asgard(object):
         if response is None:
             message = 'Response Not Found'
             self.log.error(message)
+
+            with open('unexpected.html', 'wb') as unexpected_html:
+                unexpected_html.write(response.text)
+
             raise AsgardError(message)
 
         if response.status_code == 401:
@@ -348,6 +352,10 @@ class Asgard(object):
             error = AsgardError(
                 self.format_dict(response), response.status_code)
             self.log.fatal(error)
+
+            with open('error.html', 'wb') as error_html:
+                error_html.write(response.text)
+
             raise error
 
         return self.format_dict(response)
