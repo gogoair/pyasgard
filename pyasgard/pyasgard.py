@@ -307,7 +307,8 @@ class Asgard(object):
                          key, value
                      ) for key, value in url_params.items() if key != 'auth')))
         response = getattr(requests, method.lower())(**url_params)
-        self.log.debug(pformat(inspect.getmembers(response)))
+        self.log.debug('Request response:\n%s',
+                       pformat(inspect.getmembers(response)))
 
         return response
 
@@ -333,8 +334,6 @@ class Asgard(object):
         """
 
         self.log.debug('Expected response status: %s', status)
-        self.log.debug('Request response:\n%s',
-                       pformat(inspect.getmembers(response)))
 
         # Just in case
         if response is None:
