@@ -125,7 +125,7 @@ MAPPING_TABLE = {
                 'imageId': '',
                 'instanceType': INSTANCE_TYPE,
                 'keyName': 'jenkins_access',
-                'pricing': 'SPOT',
+                #'pricing': 'SPOT',
                 'kernelId': '',
                 'ramdiskId': '',
                 'iamInstanceProfile': '',
