@@ -291,6 +291,11 @@ MAPPING_TABLE = {
                 '_action_save': '',
             },
         },
+        'show': {
+            'path': '/loadBalancer/show/${elb_id}.json',
+            'method': 'GET',
+            'status': 200,
+        },
     },
     'instance': {
         # 'create': {
