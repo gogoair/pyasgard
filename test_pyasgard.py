@@ -8,9 +8,11 @@
     USERNAME = 'happydog'
 """
 import logging
+import re
 from pprint import pformat
 
 import pytest
+
 from pyasgard.endpoints import MAPPING_TABLE
 from pyasgard.pyasgard import Asgard, AsgardAuthenticationError, AsgardError
 
@@ -195,6 +197,17 @@ def test_errors():
     asgarderror = AsgardAuthenticationError('message')
     assert str(asgarderror) == repr('401: message')
     assert asgarderror.error_code == 401
+
+
+def test_server():
+    """Make sure basic Server calls work."""
+    assert isinstance(ASGARD.server.build(), int)
+
+    match = re.search(r'^\d{1,3}' + 3 * r'\.\d{1,3}', ASGARD.server.ip())
+    assert match.group()
+
+    match = re.search(r'\d+d \d+h \d+m \d+s', ASGARD.server.uptime())
+    assert match.group()
 
 
 if __name__ == '__main__':
