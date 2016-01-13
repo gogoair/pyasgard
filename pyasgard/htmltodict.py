@@ -27,28 +27,30 @@ except ImportError:
 class HTMLToDict(HTMLParser):
     """Parse HTML and transcode to dict."""
 
-    def __init__(self, raise_exception=True):
+    def __init__(self, content, raise_exception=True):
         HTMLParser.__init__(self)
+
         self.doc = {}
         self.path = []
         self.cur = self.doc
         self.line = 0
         self.raise_exception = raise_exception
+        self.soup = BeautifulSoup(content, 'html.parser')
+
+        self.feed(self.soup.prettify())
 
     @property
     def json(self):
         """Return the JSON object."""
         return self.doc
 
-    @staticmethod
-    def dict(content, raise_exception=True):
-        """Convert HTML to dict."""
-        parser = HTMLToDict(raise_exception=raise_exception)
+    def dict(self):
+        """Convert HTML to dict.
 
-        soup = BeautifulSoup(content, 'html.parser')
-        parser.feed(soup.prettify())
-
-        return parser.json
+        Calling the _json_ attribute will use HTMLParser to convert the
+        contents of self.feed from HTML into a Dict object.
+        """
+        return self.json
 
     def handle_starttag(self, tag, attrs):
         """Handle starting tag."""
