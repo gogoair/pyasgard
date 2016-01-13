@@ -382,7 +382,11 @@ class Asgard(object):
             with open('output.html', 'wt') as output_html:
                 output_html.write(response.text)
 
-            return self.parse_errors(HTMLToDict().dict(response.text))
+            htmldict = HTMLToDict().dict(response.text)
+            if 'html' in htmldict:
+                return self.parse_errors(htmldict)
+            else:
+                return response.text
 
     def parse_errors(self, htmldict):
         """Parse out the Asgard errors from the htmldict output"""
