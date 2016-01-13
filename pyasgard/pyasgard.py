@@ -343,7 +343,7 @@ class Asgard(object):
             message = 'Response Not Found'
             self.log.error(message)
 
-            with open('unexpected.html', 'wb') as unexpected_html:
+            with open('unexpected.html', 'wt') as unexpected_html:
                 unexpected_html.write(response.text)
 
             raise AsgardError(message)
@@ -356,7 +356,7 @@ class Asgard(object):
                 self.format_dict(response), response.status_code)
             self.log.fatal(error)
 
-            with open('error.html', 'wb') as error_html:
+            with open('error.html', 'wt') as error_html:
                 error_html.write(response.text)
 
             raise error
@@ -367,18 +367,19 @@ class Asgard(object):
         """Format the response into a dict from HTML or JSON."""
         # Deserialize json content if content exist. In some cases Asgard
         # returns ' ' strings. Also return false non strings (0, [], (), {})
+
         try:
             response_json = response.json()
             self.log.debug('Response JSON:\n%s', pformat(response_json))
 
-            with open('output.json', 'wb') as output_json:
+            with open('output.json', 'wt') as output_json:
                 output_json.write(response.text)
 
             return response_json
         except ValueError:
             self.log.debug('Response HTML:\n%s', response.text)
 
-            with open('output.html', 'wb') as output_html:
+            with open('output.html', 'wt') as output_html:
                 output_html.write(response.text)
 
             return self.parse_errors(HTMLToDict().dict(response.text))
