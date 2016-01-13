@@ -385,21 +385,21 @@ class Asgard(object):
 
     def parse_errors(self, htmldict):
         """Parse out the Asgard errors from the htmldict output"""
-        results = {}
-
-        try:
-            results['severity'] = htmldict['html']['body']['div'][3]['div']['#class']
-        except KeyError:
-            results['severity'] = 'error'
+        results = {'raw': htmldict, 'issues': []}
 
         try:
             errors = htmldict['html']['body']['div'][3]['div']['ul']
-            results['issues'] = []
 
             for error in errors:
-                results['issues'].append(errors[error][''])
-
+                try:
+                    results['issues'].append(errors[error][''])
+                except TypeError:
+                    for issues in errors[error]:
+                        results['issues'].append(issues[''])
         except KeyError:
-            results['issues'] = ['unknown']
+            error = htmldict['html']['body']['div'][3]['div']['']
+            results['issues'].append(error)
+        except TypeError:
+            results['issues'].append('unknown')
 
         return results
