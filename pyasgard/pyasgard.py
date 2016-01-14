@@ -389,6 +389,14 @@ class Asgard(object):
 
         Deserialize json content if content exist. In some cases Asgard returns
         ' ' strings. Also return false non strings (0, [], (), {})
+
+        Args:
+            response: requests.models.Response object.
+
+        Returns:
+            Dict representation of HTML or JSON.
+            Str when Asgard returns simple text.
+            Int when Asgard returns simple integer.
         """
         try:
             response_json = response.json()
