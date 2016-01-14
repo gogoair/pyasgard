@@ -206,7 +206,9 @@ def test_server():
     match = re.search(r'^\d{1,3}' + 3 * r'\.\d{1,3}', ASGARD.server.ip())
     assert match.group()
 
-    match = re.search(r'\d+d (\d+h )?(\d+m )?\d+s', ASGARD.server.uptime())
+    uptime = ASGARD.server.uptime()
+    logging.debug(uptime)
+    match = re.search(r'\d+d (\d+h )?(\d+m )?\d+s', uptime)
     assert match.group()
 
 
