@@ -37,6 +37,27 @@ class AsgardAuthenticationError(AsgardError):
         return super(AsgardAuthenticationError, self).__str__()
 
 
+class AsgardReturnedError(AsgardError):
+    """Embedded error or message in HTML returned from Asgard."""
+
+    def __init__(self, htmldict):
+        """Save HTMLToDict object for inspection.
+
+        Args:
+            htmldict: HTMLToDict object.
+        """
+        super(AsgardReturnedError, self).__init__('Asgard returned error.')
+
+        self.htmldict = htmldict
+        self.issues = [
+            issue.text
+            for issue in htmldict.soup.find_all(class_=('message', 'errors'))
+        ]
+
+    def __str__(self):
+        return '\n'.join(self.issues)
+
+
 class AsgardCommand(object):  # pylint: disable=R0903
     """Dynamic construction of attributes based on endpoint mapping table.
 
