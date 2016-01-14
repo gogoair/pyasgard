@@ -105,36 +105,23 @@ def test_applications():
     test_name = 'pyasgard_test'
     test_description = 'Testing this out.'
 
-    pre_response = ASGARD.application.list()
+    # validate test app does not exist
+    with pytest.raises(AsgardError):
+        check_app_deleted = ASGARD.application.show(app_name=test_name)
+        logging.debug('precheck_app:\n%s', pformat(check_app_deleted))
 
+    # create new app
     ASGARD.application.create(name=test_name, description=test_description)
 
-    post_response = ASGARD.application.list()
+    new_app = ASGARD.application.show(app_name=test_name)
 
-    new_application = []
-    for app in post_response:
-        pre_apps = [pre_app['name'] for pre_app in pre_response]
-        log.debug('pre_apps=%s', pre_apps)
+    assert new_app['app']['name'] == test_name
+    assert new_app['app']['description'] == test_description
 
-        log.debug('app name=%s', app['name'])
-        if app['name'] not in pre_apps:
-            new_application.append(app)
-
-    log.debug('new_application=%s', new_application)
-
-    assert len(new_application) == 1
-
-    new_application = new_application[0]
-
-    assert new_application['name'] == test_name
-    assert new_application['description'] == test_description
-
-    check_app_exists = ASGARD.application.show(app_name=test_name)
-    logging.debug('check_app:\n%s', pformat(check_app_exists))
-    assert check_app_exists['app']['description'] == test_description
-
+    # delete app
     ASGARD.application.delete(name=test_name)
 
+    # validate it got deleted
     with pytest.raises(AsgardError):
         check_app_deleted = ASGARD.application.show(app_name=test_name)
         logging.debug('check_app:\n%s', pformat(check_app_deleted))
@@ -234,4 +221,5 @@ if __name__ == '__main__':
         format='[%(levelname)s]%(module)s:%(funcName)s - %(message)s')
     TEST_ARGS = ['-v', '--cov', 'pyasgard', '--cov-report', 'term-missing',
                  '--cov-report', 'html', __file__]
+
     pytest.main(TEST_ARGS)
