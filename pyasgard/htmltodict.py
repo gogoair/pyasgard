@@ -1,5 +1,8 @@
 """Convert HTML to dict with some help from Beautiful Soup 4.
 
+Original code found: http://www.xavierdupre.fr/blog/2013-10-27_nojs.html
+Original author: Xavier Dupré
+
 We use Beautiful Soup 4 to sanitize the incoming HTML before parsing. Once
 done, we construct a dictionary object from the HTML tags that can be converted
 to JSON if desired.
