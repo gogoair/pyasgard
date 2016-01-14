@@ -17,11 +17,11 @@ from bs4 import BeautifulSoup
 try:
     # python2
     from HTMLParser import HTMLParser
-    string_types = (str, unicode)
+    STRING_TYPES = (str, unicode)
 except ImportError:
     # python3
     from html.parser import HTMLParser
-    string_types = (str)
+    STRING_TYPES = (str)
 
 
 class HTMLToDict(HTMLParser):
@@ -98,7 +98,7 @@ class HTMLToDict(HTMLParser):
         for key in list(values.keys()):
             value = values[key]
 
-            if isinstance(value, string_types):
+            if isinstance(value, STRING_TYPES):
                 stripped = value.strip(" \n\r\t")
 
                 if stripped == '':
