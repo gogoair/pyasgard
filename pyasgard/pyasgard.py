@@ -382,7 +382,7 @@ class Asgard(object):
             with open('output.html', 'wt') as output_html:
                 output_html.write(response.text)
 
-            htmldict = HTMLToDict().dict(response.text)
+            htmldict = HTMLToDict(response.text).dict()
             if 'html' in htmldict:
                 return self.parse_errors(htmldict)
             else:
