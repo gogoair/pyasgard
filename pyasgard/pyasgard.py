@@ -249,6 +249,8 @@ class Asgard(object):
         self.api_version = api_version
         self.mapping_table = MAPPING_TABLE
 
+        self.htmldict = None
+
     def __dir__(self):
         self_keys = list(self.__dict__.keys())
         map_keys = list(self.mapping_table.keys())
@@ -412,29 +414,23 @@ class Asgard(object):
             with open('output.html', 'wt') as output_html:
                 output_html.write(response.text)
 
-            htmldict = HTMLToDict(response.text).dict()
-            if 'html' in htmldict:
-                return self.parse_errors(htmldict)
+            self.htmldict = HTMLToDict(response.text)
+            if 'html' in self.htmldict.dict():
+                return self.parse_errors()
             else:
                 return response.text
 
-    def parse_errors(self, htmldict):
-        """Parse out the Asgard errors from the htmldict output"""
-        results = {'raw': htmldict, 'issues': []}
+    def parse_errors(self):
+        """Parse out the Asgard errors from the htmldict output.
 
-        try:
-            errors = htmldict['html']['body']['div'][3]['div']['ul']
+        Returns:
+            Dict representation of HTML page.
 
-            for error in errors:
-                try:
-                    results['issues'].append(errors[error][''])
-                except TypeError:
-                    for issues in errors[error]:
-                        results['issues'].append(issues[''])
-        except KeyError:
-            error = htmldict['html']['body']['div'][3]['div']['']
-            results['issues'].append(error)
-        except TypeError:
-            results['issues'].append('unknown')
+        Raises:
+            AsgardReturnedError: Asgard returned a page with embedded errors or
+                messages.
+        """
+        if self.htmldict.soup.find_all(class_='errors') != []:
+            raise AsgardReturnedError(self.htmldict)
 
-        return results
+        return self.htmldict.dict()
