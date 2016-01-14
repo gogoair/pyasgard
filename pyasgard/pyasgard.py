@@ -234,7 +234,7 @@ class Asgard(object):
         return self_keys + map_keys
 
     def __getattr__(self, api_call):
-        # Execute dynamic method and pass in keyword args as data to API call
+        """Execute dynamic method and pass keyword args as data to API call."""
         return AsgardCommand(self, api_call, self.mapping_table)
 
     def decrypt_password(self, password):
