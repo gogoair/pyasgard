@@ -364,10 +364,11 @@ class Asgard(object):
         return self.format_dict(response)
 
     def format_dict(self, response):
-        """Format the response into a dict from HTML or JSON."""
-        # Deserialize json content if content exist. In some cases Asgard
-        # returns ' ' strings. Also return false non strings (0, [], (), {})
+        """Format the response into a dict from HTML or JSON.
 
+        Deserialize json content if content exist. In some cases Asgard returns
+        ' ' strings. Also return false non strings (0, [], (), {})
+        """
         try:
             response_json = response.json()
             self.log.debug('Response JSON:\n%s', pformat(response_json))
