@@ -1,7 +1,4 @@
 """Python interface to Netflix Asgard REST API."""
-__author__ = "Sijis Aviles <saviles@gogoair.com>"
-__version__ = "1.0"
-
 import base64
 import inspect
 import json
@@ -13,6 +10,9 @@ import requests
 
 from .endpoints import MAPPING_TABLE
 from .htmltodict import HTMLToDict
+
+__author__ = "Sijis Aviles <saviles@gogoair.com>"
+__version__ = "1.0"
 
 
 class AsgardError(Exception):
