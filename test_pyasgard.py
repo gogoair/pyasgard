@@ -14,7 +14,8 @@ from pprint import pformat
 import pytest
 
 from pyasgard.endpoints import MAPPING_TABLE
-from pyasgard.pyasgard import Asgard, AsgardAuthenticationError, AsgardError
+from pyasgard.pyasgard import (Asgard, AsgardAuthenticationError, AsgardError,
+                               AsgardReturnedError)
 
 try:
     from config import URL, ENC_PASSWD, USERNAME
@@ -174,9 +175,17 @@ def test_json_return():
 
 def test_html_return():
     """Send bad data, make sure that returned HTML comes back as a dict."""
-    returned = ASGARD.application.create(name='ntangsurat', email='')
-    logging.debug(returned)
-    assert isinstance(returned, dict)
+    with pytest.raises(AsgardReturnedError):
+        returned = ASGARD.application.create(name='ntangsurat', email='')
+
+        logging.debug(returned)
+        assert isinstance(returned, dict)
+
+    with pytest.raises(AsgardReturnedError):
+        returned = ASGARD.elb.create()
+
+        logging.debug(returned)
+        assert isinstance(returned, dict)
 
 
 def test_bad_argument():
