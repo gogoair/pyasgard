@@ -17,11 +17,11 @@ from bs4 import BeautifulSoup
 try:
     # python2
     from HTMLParser import HTMLParser
-    STRING_TYPES = (str, unicode)
+    STRING_TYPES = (str, unicode)  # pylint: disable=E0602
 except ImportError:
     # python3
-    from html.parser import HTMLParser
-    STRING_TYPES = (str)
+    from html.parser import HTMLParser  # pylint: disable=C0411
+    STRING_TYPES = (str)  # pylint: disable=C0103,R0204
 
 
 class HTMLToDict(HTMLParser):
