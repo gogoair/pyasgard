@@ -58,7 +58,14 @@ class AsgardCommand(object):  # pylint: disable=R0903
 
     def __getattr__(self, command):
         """Recursively generate objects for endpoints."""
-        return AsgardCommand(self.client, command, self.api_map)
+        next_api = self.api_map.get(command, None)
+
+        if isinstance(next_api, dict):
+            self.log.debug('Next API level: %s', next_api)
+            return AsgardCommand(self.client, command, self.api_map)
+        else:
+            self.log.debug('Reached leaf "%s" of map: %s', command, next_api)
+            return next_api
 
     def __call__(self, **kwargs):
         """Request call to Asgard API.
