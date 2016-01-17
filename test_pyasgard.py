@@ -12,10 +12,10 @@ import re
 from pprint import pformat
 
 import pytest
-
 from pyasgard.endpoints import MAPPING_TABLE
-from pyasgard.pyasgard import (Asgard, AsgardAuthenticationError, AsgardError,
-                               AsgardReturnedError)
+from pyasgard.exceptions import (AsgardAuthenticationError, AsgardError,
+                                 AsgardReturnedError)
+from pyasgard.pyasgard import Asgard
 
 try:
     from config import URL, ENC_PASSWD, USERNAME
