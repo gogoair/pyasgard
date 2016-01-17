@@ -57,6 +57,7 @@ class AsgardCommand(object):  # pylint: disable=R0903
             self.__doc__ = 'No docstring provided.'
 
         self.__class__.__doc__ = None
+        self.__class__.__call__.__doc__ = None
 
     def __dir__(self):
         """Dynamically generate attributes and methods based on endpoints."""
