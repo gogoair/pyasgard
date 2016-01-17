@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 """Convert HTML to dict with some help from Beautiful Soup 4.
 
 Original code found: http://www.xavierdupre.fr/blog/2013-10-27_nojs.html
