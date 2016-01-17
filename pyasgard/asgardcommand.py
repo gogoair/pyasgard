@@ -32,8 +32,10 @@ class AsgardCommand(object):  # pylint: disable=R0903
         Should probably url-encode GET query parameters on replacement
     """
 
-    def __init__(self, client, api_call, menu):
+    def __init__(self, client, api_call, menu, parent='Asgard'):
         super(AsgardCommand, self).__init__()
+
+        self.__name__ = '.'.join([parent, api_call])
 
         self.log = logging.getLogger(__name__)
         self.log.debug('getattr locals():\n%s', pformat(locals()))
@@ -62,7 +64,10 @@ class AsgardCommand(object):  # pylint: disable=R0903
 
         if isinstance(next_api, dict):
             self.log.debug('Next API level: %s', next_api)
-            return AsgardCommand(self.client, command, self.api_map)
+            return AsgardCommand(self.client,
+                                 command,
+                                 self.api_map,
+                                 parent=self.__name__)
         else:
             self.log.debug('Reached leaf "%s" of map: %s', command, next_api)
             return next_api
