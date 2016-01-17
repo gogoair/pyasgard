@@ -413,6 +413,7 @@ MAPPING_TABLE = {
         },
     },
     'test': {
+        'doc': 'Test commands.',
         'test': {
             'doc': 'Test docstring.',
             'path': '',
