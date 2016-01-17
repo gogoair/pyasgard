@@ -34,11 +34,10 @@ class AsgardCommand(object):  # pylint: disable=R0903
 
     def __init__(self, client, api_call, menu, parent='Asgard'):
         super(AsgardCommand, self).__init__()
+        self.log = logging.getLogger(__name__)
 
         self.__name__ = '.'.join([parent, api_call])
-
-        self.log = logging.getLogger(__name__)
-        self.log.debug('getattr locals():\n%s', pformat(locals()))
+        self.log.debug('Command name: %s', self.__name__)
 
         self.client = client
         self.api_call = api_call
