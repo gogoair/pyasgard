@@ -184,13 +184,13 @@ def test_bad_argument():
 
 def test_errors():
     """Make sure custom errors have the right attributes."""
-    asgarderror = AsgardError('message', 404)
-    assert str(asgarderror) == repr('404: message')
-    assert asgarderror.error_code == 404
+    error404 = AsgardError('message', 404)
+    assert str(error404) == repr('404: message')
+    assert error404.error_code == 404
 
-    asgarderror = AsgardAuthenticationError('message')
-    assert str(asgarderror) == repr('401: message')
-    assert asgarderror.error_code == 401
+    error401 = AsgardAuthenticationError('message')
+    assert str(error401) == repr('401: message')
+    assert error401.error_code == 401
 
 
 def test_server():
