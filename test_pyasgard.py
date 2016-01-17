@@ -100,8 +100,6 @@ def test_success():
 
 def test_applications():
     """Check Applications are working."""
-    log = logging.getLogger(__name__)
-
     test_name = 'pyasgard_test'
     test_description = 'Testing this out.'
 
