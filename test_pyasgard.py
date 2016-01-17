@@ -18,7 +18,7 @@ from pyasgard.exceptions import (AsgardAuthenticationError, AsgardError,
 from pyasgard.pyasgard import Asgard
 
 try:
-    from config import URL, ENC_PASSWD, USERNAME
+    from config import URL, ENC_PASSWD, USERNAME  # pylint: disable=C0411
 except ImportError:
     ENC_PASSWD = 'dGVzdHBhc3N3ZA=='
     URL = 'http://asgard.demo.com'
