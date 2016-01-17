@@ -106,6 +106,23 @@ class Asgard(object):
 
         return {}
 
+    def find_path_keys(self, path):
+        """Extract keys from the path.
+
+        Args:
+            path: String of endpoint path with possible _${parameter}_
+            templated parameters.
+
+        Returns:
+            List of parameters found in endpoint path.
+        """
+        keys = [param[2] for param in Template.pattern.findall(path)]
+
+        self.log.debug('Template find=%s', Template.pattern.findall(path))
+        self.log.debug('path_keys=%s', keys)
+
+        return keys
+
     def format_url(self, path, kwargs):
         """Format request URL with endpoint mapping.
 
@@ -122,10 +139,7 @@ class Asgard(object):
         """
         self.log.debug('URL formatter locals:\n%s', pformat(locals()))
 
-        # get keys parsed
-        path_keys = [param[2] for param in Template.pattern.findall(path)]
-        self.log.debug('Template find=%s', Template.pattern.findall(path))
-        self.log.debug('path_keys=%s', path_keys)
+        path_keys = self.find_path_keys(path)
 
         # Substitute mustache '{}' placeholders with data from keywords
         substitute_path = Template(path).substitute(kwargs)
