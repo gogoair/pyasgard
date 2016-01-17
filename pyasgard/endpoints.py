@@ -4,6 +4,11 @@ INSTANCE_TYPE = 't2.micro'
 MAPPING_TABLE = {
     'ami': {
         'show': {
+            'doc': """Show details for an AMI.
+
+            Args:
+                ami_id: ID of an existing AMI.
+            """,
             'path': '/image/show/${ami_id}.json',
             'method': 'GET',
             'status': 200,
@@ -40,13 +45,22 @@ MAPPING_TABLE = {
             'method': 'GET',
             'status': 200,
             'instances': {
-                'doc': 'List Application Instances.',
+                'doc': """List Application Instances.
+
+                Args:
+                    app_id: Name of an existing Application.
+                """,
                 'path': '/instance/list/${app_id}.json',
                 'method': 'GET',
                 'status': 200,
             },
         },
         'show': {
+            'doc': """Show details for an Application.
+
+            Args:
+                app_name: Name of an existing Application.
+            """,
             'path': '/application/show/${app_name}.json',
             'method': 'GET',
             'status': 200,
@@ -83,6 +97,11 @@ MAPPING_TABLE = {
             'status': 200,
         },
         'show': {
+            'doc': """Show details for an ASG.
+
+            Args:
+                asg_id: ID of an existing ASG.
+            """,
             'path': '/autoScaling/show/${asg_id}.json',
             'method': 'GET',
             'status': 200,
@@ -232,6 +251,11 @@ MAPPING_TABLE = {
             'status': 200,
         },
         'show': {
+            'doc': """Show details for a Cluster.
+
+            Args:
+                cluster_id: ID of an existing Cluster.
+            """,
             'path': '/cluster/show/${cluster_id}.json',
             'method': 'GET',
             'status': 200,
@@ -244,16 +268,31 @@ MAPPING_TABLE = {
             'status': 200,
         },
         'prepare': {
+            'doc': """Generate JSON for customizing an Asgard Deployment.
+
+            Args:
+                cluster_id: ID of an existing Cluster.
+            """,
             'path': '/deployment/prepare/${cluster_id}.json',
             'method': 'GET',
             'status': 200,
         },
         'show': {
+            'doc': """Show details for an Asgard Deployment.
+
+            Args:
+                deployment_id: ID of a running Deployment.
+            """,
             'path': '/deployment/show/${deployment_id}.json',
             'method': 'GET',
             'status': 200,
         },
         'detail': {
+            'doc': """Show details for an Asgard Deployment.
+
+            Args:
+                deployment_id: ID of a running Deployment.
+            """,
             'path': '/ng#/deployment/detail/${deployment_id}.json',
             'method': 'GET',
             'status': 200,
@@ -309,6 +348,11 @@ MAPPING_TABLE = {
             },
         },
         'show': {
+            'doc': """Show details for an ELB.
+
+            Args:
+                elb_id: ID of an existing ELB.
+            """,
             'path': '/loadBalancer/show/${elb_id}.json',
             'method': 'GET',
             'status': 200,
@@ -325,6 +369,11 @@ MAPPING_TABLE = {
             'status': 200,
         },
         'show': {
+            'doc': """Show details for an Instance.
+
+            Args:
+                instance_id: ID of an existing Instance.
+            """,
             'path': '/instance/show/${instance_id}.json',
             'method': 'GET',
             'status': 200,
@@ -337,6 +386,11 @@ MAPPING_TABLE = {
             'status': 200,
         },
         'show': {
+            'doc': """Show details for a Launch Configuration.
+
+            Args:
+                config_name: Name of an existing Launch Configuration.
+            """,
             'path': '/launchConfiguration/show/${config_name}.json',
             'method': 'GET',
             'status': 200,
