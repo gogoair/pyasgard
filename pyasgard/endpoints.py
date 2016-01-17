@@ -97,6 +97,23 @@ MAPPING_TABLE = {
             },
         },
         'create': {
+            'doc': """Create an ASG.
+
+            Before calling this command, the MAPPING_TABLE must be modified to
+            insert a dynamically constructed key::
+
+                client = Asgard('http://test.com')
+                vpc_id = 'vpc-something'
+                lb_list = ['lb-something']
+                lb_param = 'selectedLoadBalancersForVpcId{0}'.format(vpc_id)
+
+                map = client.mapping_table['asg']['create']['default_params']
+                map[lb_param] = lb_list
+
+                client.asg.create(**{lotsofparams})
+
+            This will translate into the correct parameter passed to Asgard.
+            """,
             'path': '/autoScaling/save',
             'method': 'POST',
             'status': 200,
@@ -121,11 +138,11 @@ MAPPING_TABLE = {
                 'subnetPurpose': 'app',
                 'selectedZones': ['us-east-1b'],
                 'azRebalance': 'enabled',
-                'selectedLoadBalancersForVpcId${vpc_id}': [''],
+                # 'selectedLoadBalancersForVpcId${vpc_id}': [''],
                 'imageId': '',
                 'instanceType': INSTANCE_TYPE,
                 'keyName': 'jenkins_access',
-                #'pricing': 'SPOT',
+                # 'pricing': 'SPOT',
                 'kernelId': '',
                 'ramdiskId': '',
                 'iamInstanceProfile': '',
