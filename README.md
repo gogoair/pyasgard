@@ -16,9 +16,32 @@ from pyasgard import Asgard
 #                 password=b64encode('secret'))
 asgard = Asgard('http://asgard.example.com')
 
-asgard.show_ami(ami_id='ami-i1234x')
-asgard.cluster_resize(name='appname', minAndMaxSize=4)
+asgard.ami.list()
+asgard.ami.show(ami_id='ami-i1234x')
+
+asgard.cluster.list()
+asgard.cluster.resize(name='appname', minAndMaxSize=4)
 ```
+
+
+## Warning
+
+The `Asgard.asg.create()` command requires some hacking to support a dynamic
+keyword argument. This is documented in the command docstring as well.
+
+```python
+client = Asgard('http://test.com')
+
+vpc_id = 'vpc-something'
+lb_list = ['lb-something']
+lb_param = 'selectedLoadBalancersForVpcId{0}'.format(vpc_id)
+
+api = client.mapping_table['asg']['create']['default_params']
+api[lb_param] = lb_list
+
+client.asg.create(**{lotsofparams})
+```
+
 
 ## Testing
 To run the unit tests, create a `config.py` file and run `tox`:
