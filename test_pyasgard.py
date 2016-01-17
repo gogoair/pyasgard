@@ -128,11 +128,13 @@ def test_applications():
 def test_mappings():
     """Check mapping table has at minimum _method_, _path_, and _status_"""
     for resource in MAPPING_TABLE.keys():
-        logging.debug('Resource = %s', resource)
         for methods in MAPPING_TABLE[resource].values():
-            assert 'method' in methods
-            assert 'path' in methods
-            assert 'status' in methods
+            logging.debug('Checking %s: %s', resource, methods)
+
+            if isinstance(methods, dict):
+                assert 'method' in methods
+                assert 'path' in methods
+                assert 'status' in methods
 
 
 def test_json_return():
