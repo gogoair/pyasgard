@@ -51,6 +51,13 @@ class AsgardCommand(object):  # pylint: disable=R0903
                                   'Options available are: {1}').format(
                                       self.api_call, menu.keys()))
 
+        try:
+            self.__doc__ = self.api_map['doc']
+        except (KeyError, TypeError):
+            self.__doc__ = 'No docstring provided.'
+
+        self.__class__.__doc__ = None
+
     def __dir__(self):
         """Dynamically generate attributes and methods based on endpoints."""
         self_keys = list(self.__dict__.keys())
