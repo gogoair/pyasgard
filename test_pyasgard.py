@@ -80,7 +80,7 @@ def test_asgard_error():
 def test_builtin_errors():
     """Check that builtin errors trigger with bad formats."""
     with pytest.raises(TypeError):
-        asgard = Asgard(URL,
+        asgard = Asgard(URL,  # pylint: disable=E1123
                         username=USERNAME,
                         password=ENC_PASSWD,
                         data={'bad': 'param'})
