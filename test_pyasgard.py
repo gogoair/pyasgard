@@ -204,7 +204,7 @@ def test_server():
 
     uptime = ASGARD.server.uptime()
     logging.debug(uptime)
-    match = re.search(r'\d+d (\d+h )?(\d+m )?\d+s', uptime)
+    match = re.search(r'(\d+d )?(\d+h )?(\d+m )?(\d+s)?', uptime)
     assert match.group()
 
 
