@@ -1,9 +1,16 @@
 """AsgardCommand Class for pyasgard."""
 import json
 import logging
+from collections import OrderedDict
 from pprint import pformat
 
 from .exceptions import AsgardError
+
+# HACK: Python 2.7 is missing cool modules
+try:
+    from inspect import Parameter, Signature
+except ImportError:
+    pass
 
 
 class AsgardCommand(object):  # pylint: disable=R0903
@@ -52,12 +59,29 @@ class AsgardCommand(object):  # pylint: disable=R0903
                                       self.api_call, menu.keys()))
 
         try:
-            self.__doc__ = self.api_map['doc']
+            docstring = self.api_map['doc']
         except (KeyError, TypeError):
-            self.__doc__ = 'No docstring provided.'
+            docstring = 'No docstring provided.'
 
-        self.__class__.__doc__ = None
-        self.__class__.__call__.__doc__ = None
+        # The remainder of this __init__ is the result of fighting docstrings
+        # while supporting Python 2.7, 3.4, and 3.5
+        try:
+            self.__class__.__doc__ = docstring
+            self.__class__.__call__.__signature__ = self.construct_signature()
+            self.log.debug('Python 3.5 works best.')
+        except AttributeError:
+            self.log.debug('Python 2.7 cannot modify the __class__ attribute.')
+
+            # HACK: Python 2.7 IPython signature line
+            self.__signature__ = self.pretty_format_params()
+        except TypeError:
+            self.log.debug('Python 3.4 inspect.Parameter does not work right.')
+            self.__doc__ = None
+            self.__class__.__doc__ = '{0}\nValid parameters: {1}'.format(
+                docstring, self.pretty_format_params())
+
+            # HACK: Python 3.4 IPython signature line
+            self.__signature__ = self.pretty_format_params()
 
     def __dir__(self):
         """Dynamically generate attributes and methods based on endpoints."""
@@ -71,10 +95,28 @@ class AsgardCommand(object):  # pylint: disable=R0903
 
         if isinstance(next_api, dict):
             self.log.debug('Next API level: %s', next_api)
-            return AsgardCommand(self.client,
-                                 command,
-                                 self.api_map,
-                                 parent=self.__name__)
+
+            # TODO: When Python 2.7 support is dropped, the rest of this block
+            # should be changed to a simple:
+            #
+            # return AsgardCommand(self.client,
+            #                      command,
+            #                      self.api_map,
+            #                      parent=self.__name__)
+            docstring = next_api.get('doc', 'No docstring provided.')
+            # call_docstring = self.__call__.__doc__
+
+            next_command = type(
+                'AsgardCommand',
+                (AsgardCommand, ),
+                {'__doc__': '{0}\nValid parameters: {1}'.format(
+                    docstring,
+                    self.pretty_format_params(api_map=next_api))})
+
+            return next_command(self.client,
+                                command,
+                                self.api_map,
+                                parent=self.__name__)
         else:
             self.log.debug('Reached leaf "%s" of map: %s', command, next_api)
             return next_api
@@ -163,3 +205,85 @@ class AsgardCommand(object):  # pylint: disable=R0903
                     raise TypeError(('{0}() got an unexpected keyword '
                                      'argument "{1}"').format(self.api_call,
                                                               keyword))
+
+    def construct_signature(self):
+        """Construct a pretty function signature for dynamic commands.
+
+        The inspect modules Parameter and Signature are fully supported in
+        Python 3.5, broken in 3.4, and missing in 2.7.
+
+        Returns:
+            Signature object for command.
+        """
+        param_dict = OrderedDict()
+
+        for param, default in sorted(self.get_all_valid_params().items()):
+            new_param = Parameter(param,
+                                  Parameter.KEYWORD_ONLY,
+                                  default=default)
+            self.log.debug('New parameter: %s', new_param)
+
+            param_dict[new_param] = param
+            self.log.debug('Parameter dictionary growing: %s', param_dict)
+
+        self.log.debug('Parameter dictionary: %s', param_dict)
+
+        new_signature = Signature(parameters=param_dict)
+        self.log.debug('New signature: %s', new_signature)
+
+        return new_signature
+
+    # TODO: When Python 2.7 support is removed, api_map kwarg should be removed
+    def get_all_valid_params(self, api_map=None):
+        """Make a list of valid parameters.
+
+        This accumulates all known parameters from any keys embedded in _path_,
+        _default_params_, and _valid_params_.
+
+        Args:
+            api_map: Dict containing keys: path, default_params, and
+                valid_params.
+
+        Returns:
+            Dict of all valid parameters for command in _{key: default}_
+            format.
+        """
+        params = {}
+
+        if not api_map:
+            api_map = self.api_map
+
+        path_params = self.client.find_path_keys(api_map.get('path', ''))
+        for param in path_params:
+            params[param] = ''
+
+        # Always make a list of valid parameters from endpoint mapping
+        valid_params = api_map.get('valid_params', [])
+        if isinstance(valid_params, str):
+            valid_params = [valid_params]
+
+        for param in valid_params:
+            params[param] = ''
+
+        params.update(api_map.get('default_params', {}))
+
+        self.log.debug('Full list of params: %s', params)
+        return params
+
+    # TODO: Remove when Python 2.7 and 3.4 support have been dropped
+    def pretty_format_params(self, api_map=None):
+        """Pretty formatting wrapper around _get_all_valid_params()_.
+
+        Args:
+            api_map: Dict containing keys: path, default_params, and
+                valid_params.
+
+        Returns:
+            Pretty string formatting of all parameters.
+        """
+        all_params_list = []
+        for key, default in self.get_all_valid_params(api_map).items():
+            all_params_list.append('{0!s}={1!r}'.format(key, default))
+
+        all_params = ', '.join(sorted(all_params_list))
+        return '({0})'.format(all_params)
