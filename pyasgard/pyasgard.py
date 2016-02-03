@@ -256,6 +256,10 @@ class Asgard(object):
     def parse_errors(self):
         """Parse out the Asgard errors from the htmldict output.
 
+        To avoid false positives, if _error_ or _message_ HTML classes are
+        found, the contents will be checked to make sure safe words are
+        included indicating a true positive.
+
         Returns:
             Dict representation of HTML page.
 
@@ -263,7 +267,22 @@ class Asgard(object):
             AsgardReturnedError: Asgard returned a page with embedded errors or
                 messages.
         """
-        if self.htmldict.soup.find_all(class_='errors') != []:
-            raise AsgardReturnedError(self.htmldict)
+        safe_words = ['created', 'deleted']
 
-        return self.htmldict.dict()
+        possible_issues = self.htmldict.soup.find_all(
+            class_=('errors', 'message'))
+        self.log.debug('Possible issues: %s', possible_issues)
+
+        # No issues found, return safely
+        if possible_issues == []:
+            return self.htmldict.dict()
+
+        # Return safely if any safe word is found
+        for issue in possible_issues:
+            self.log.debug('Issue: %s', issue)
+
+            if any(word in issue.text.lower() for word in safe_words):
+                return self.htmldict.dict()
+
+        self.log.fatal('Asgard returned possible issues: %s', possible_issues)
+        raise AsgardReturnedError(self.htmldict)
