@@ -116,6 +116,10 @@ def test_applications():
     assert new_app['app']['name'] == test_name
     assert new_app['app']['description'] == test_description
 
+    # Trying to double create should raise error
+    with pytest.raises(AsgardReturnedError):
+        ASGARD.application.create(name=test_name, description=test_description)
+
     # delete app
     ASGARD.application.delete(name=test_name)
 
