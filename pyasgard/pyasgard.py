@@ -14,7 +14,7 @@ from .exceptions import (AsgardAuthenticationError, AsgardError,
 from .htmltodict import HTMLToDict
 
 __author__ = "Sijis Aviles <saviles@gogoair.com>"
-__version__ = "1.0"
+__version__ = "1.2"
 
 
 class Asgard(object):
