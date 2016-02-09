@@ -267,7 +267,7 @@ class Asgard(object):
             AsgardReturnedError: Asgard returned a page with embedded errors or
                 messages.
         """
-        safe_words = ['created', 'deleted', 'updated']
+        safe_words = ['added', 'created', 'deleted', 'removed', 'updated']
 
         possible_issues = self.htmldict.soup.find_all(
             class_=('errors', 'message'))

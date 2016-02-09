@@ -374,6 +374,48 @@ MAPPING_TABLE = {
                 '_action_update': '',
             },
         },
+        'listener': {
+            'doc': """Manipulate listeners for an existing ELB.""",
+            'add': {
+                'doc': """Add a listener to an existing ELB.
+
+                Args:
+                    name: Name of the Load Balancer.
+                    protocol: Can be either HTTP or TCP.
+                    lbPort: Int of the port which the ELB will listen on,
+                        cannot be in use by another listener.
+                    instancePort: Int of the port which Instances are using.
+                """,
+                'path': '/loadBalancer/save',
+                'method': 'POST',
+                'status': 200,
+                'default_params': {
+                    'ticket': '',
+                    'protocol': 'HTTP',
+                    'lbPort': 80,
+                    'instancePort': 8080,
+                    'name': '',
+                    '_action_addListener': '',
+                },
+            },
+            'remove': {
+                'doc': """Remove a listener from an existing ELB.
+
+                Args:
+                    name: Name of the Load Balancer.
+                    lbPort: Int for the Load Balancer port number.
+                """,
+                'path': '/loadBalancer/save',
+                'method': 'POST',
+                'status': 200,
+                'default_params': {
+                    'ticket': '',
+                    'name': '',
+                    'lbPort': 80,
+                    '_action_removeListener': '',
+                }
+            },
+        }
     },
     'instance': {
         # 'create': {
