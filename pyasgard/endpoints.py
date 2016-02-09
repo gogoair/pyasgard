@@ -357,6 +357,23 @@ MAPPING_TABLE = {
             'method': 'GET',
             'status': 200,
         },
+        'update': {
+            'doc': """Update ELB configuration with new settings.""",
+            'path': '/loadBalancer/index',
+            'method': 'POST',
+            'status': 200,
+            'default_params': {
+                'ticket': '',
+                'name': '',
+                'selectedZones': ['us-east-1b'],
+                'target': 'TCP:8080',
+                'interval': 10,
+                'timeout': 5,
+                'unhealthy': 2,
+                'healthy': 2,
+                '_action_update': '',
+            },
+        },
     },
     'instance': {
         # 'create': {
