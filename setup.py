@@ -1,7 +1,11 @@
 from setuptools import find_packages, setup
 
+version = {}
+with open('pyasgard/version.py', 'rt') as version_file:
+    exec(version_file.read(), version)
+
 setup(name='pyasgard',
-      version='1.2',
+      version=version['__version__'],
       description='Python library for working with the Asgard api.',
       long_description=open('README.md').read(),
       author='Sijis Aviles',

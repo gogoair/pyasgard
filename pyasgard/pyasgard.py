@@ -12,9 +12,7 @@ from .endpoints import MAPPING_TABLE
 from .exceptions import (AsgardAuthenticationError, AsgardError,
                          AsgardReturnedError)
 from .htmltodict import HTMLToDict
-
-__author__ = "Sijis Aviles <saviles@gogoair.com>"
-__version__ = "1.2"
+from .version import __version__
 
 
 class Asgard(object):
