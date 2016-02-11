@@ -405,6 +405,18 @@ MAPPING_TABLE = {
             'status': 200,
         },
     },
+    'sdb': {
+        'list': {
+            'path': '/domain/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/domain/show/${name}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
     'subnets': {
         'list': {
             'path': '/subnet/list.json',
