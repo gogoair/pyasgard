@@ -343,6 +343,42 @@ MAPPING_TABLE = {
             },
         },
     },
+    'rds': {
+        'list': {
+            'path': '/rdsInstance/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/rdsInstance/show/${name}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
+    'rdssecurity': {
+        'list': {
+            'path': '/dbSecurity/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/dbSecurity/show/${name}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
+    'rdssnapshot': {
+        'list': {
+            'path': '/dbSnapshot/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/dbSnapshot/show/${name}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
     'regions': {
         'list': {
             'path': '/region/list.json',
