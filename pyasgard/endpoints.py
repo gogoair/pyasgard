@@ -474,9 +474,57 @@ MAPPING_TABLE = {
             },
         },
     },
+    'rds': {
+        'list': {
+            'path': '/rdsInstance/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/rdsInstance/show/${name}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
+    'rdssecurity': {
+        'list': {
+            'path': '/dbSecurity/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/dbSecurity/show/${name}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
+    'rdssnapshot': {
+        'list': {
+            'path': '/dbSnapshot/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/dbSnapshot/show/${name}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
     'regions': {
         'list': {
             'path': '/region/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
+    'sdb': {
+        'list': {
+            'path': '/domain/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/domain/show/${name}.json',
             'method': 'GET',
             'status': 200,
         },
@@ -536,9 +584,45 @@ MAPPING_TABLE = {
             'status': 200,
         },
     },
+    'sns': {
+        'list': {
+            'path': '/topic/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/topic/show/${name}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
+    'sqs': {
+        'list': {
+            'path': '/queue/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/queue/show/${name}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
     'subnets': {
         'list': {
             'path': '/subnet/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
+    'task': {
+        'list': {
+            'path': '/task/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/task/show/${id}.json',
             'method': 'GET',
             'status': 200,
         },
