@@ -412,6 +412,18 @@ MAPPING_TABLE = {
             'status': 200,
         },
     },
+    'task': {
+        'list': {
+            'path': '/task/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/task/show/${id}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
     'test': {
         'test': {
             'doc': 'Test docstring.',
