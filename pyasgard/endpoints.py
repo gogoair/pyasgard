@@ -350,6 +350,18 @@ MAPPING_TABLE = {
             'status': 200,
         },
     },
+    'sdb': {
+        'list': {
+            'path': '/domain/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/domain/show/${name}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
     'security': {
         'create': {
             'path': '/security/create',
@@ -405,14 +417,14 @@ MAPPING_TABLE = {
             'status': 200,
         },
     },
-    'sdb': {
+    'sns': {
         'list': {
-            'path': '/domain/list.json',
+            'path': '/topic/list.json',
             'method': 'GET',
             'status': 200,
         },
         'show': {
-            'path': '/domain/show/${name}.json',
+            'path': '/topic/show/${name}.json',
             'method': 'GET',
             'status': 200,
         },
