@@ -429,6 +429,18 @@ MAPPING_TABLE = {
             'status': 200,
         },
     },
+    'sqs': {
+        'list': {
+            'path': '/queue/list.json',
+            'method': 'GET',
+            'status': 200,
+        },
+        'show': {
+            'path': '/queue/show/${name}.json',
+            'method': 'GET',
+            'status': 200,
+        },
+    },
     'subnets': {
         'list': {
             'path': '/subnet/list.json',
