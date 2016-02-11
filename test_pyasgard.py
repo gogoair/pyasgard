@@ -136,9 +136,10 @@ def test_mappings():
             logging.debug('Checking %s: %s', resource, methods)
 
             if isinstance(methods, dict):
-                assert 'method' in methods
-                assert 'path' in methods
-                assert 'status' in methods
+                if '_branch' not in methods:
+                    assert 'method' in methods
+                    assert 'path' in methods
+                    assert 'status' in methods
 
 
 def test_json_return():

@@ -376,6 +376,7 @@ MAPPING_TABLE = {
         },
         'listener': {
             'doc': """Manipulate listeners for an existing ELB.""",
+            '_branch': '',
             'add': {
                 'doc': """Add a listener to an existing ELB.
 
