@@ -18,8 +18,10 @@ setup(name='pyasgard',
       download_url='https://github.com/gogoit/pyasgard',
       platforms=['OS Independent'],
       classifiers=[
-          'Development Status :: 1 - Beta',
+          'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',
           'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3.4',
+          'Programming Language :: Python :: 3.5',
           'Operating System :: OS Independent',
       ], )
