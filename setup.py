@@ -7,7 +7,7 @@ with open('pyasgard/version.py', 'rt') as version_file:
 setup(name='pyasgard',
       version=version['__version__'],
       description='Python library for working with the Asgard api.',
-      long_description=open('README.md').read(),
+      long_description=open('README.rst').read(),
       author='Sijis Aviles',
       author_email='saviles@gogoair.com',
       packages=find_packages(),
