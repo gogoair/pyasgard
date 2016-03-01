@@ -17,11 +17,13 @@ setup(name='pyasgard',
       url='https://github.com/gogoit/pyasgard',
       download_url='https://github.com/gogoit/pyasgard',
       platforms=['OS Independent'],
+      license='MIT',
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',
           'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3.4',
           'Programming Language :: Python :: 3.5',
+          'License :: OSI Approved :: MIT License',
           'Operating System :: OS Independent',
       ], )
