@@ -1,3 +1,6 @@
+.. attention:: DEPRECATED
+   This is no longer being maintained and no future changes, updates or enhancements will be added.
+
 Asgard Python Library
 ---------------------
 
